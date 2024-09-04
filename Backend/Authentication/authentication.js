@@ -50,7 +50,7 @@ async function verifyPassword(inputPassword, hashedPassword) {
 
 async function verifyUser(username, password) {
 	await client.connect();
-	const database = client.db("users");
+	const database = client.db("petfinder");
 	const users = database.collection("users");
 	const userExist = await userExists(users, username);
 	if (!userExist) {
@@ -69,7 +69,7 @@ async function verifyUser(username, password) {
 
 async function createUserEntry(username, password) {
 	await client.connect();
-	const database = client.db("users");
+	const database = client.db("petfinder");
 	const users = database.collection("users");
 	const userExist = await userExists(users, username);
 	if (userExist) {
