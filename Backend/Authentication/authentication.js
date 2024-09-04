@@ -3,7 +3,7 @@ const bcrypt = require("bcrypt");
 const { AuthenticationErrors } = require("./authenticationErrors");
 
 const url =
-	"mongodb+srv://gracechen56607:goweekend3210@petfinder.h236iki.mongodb.net/?retryWrites=true&w=majority&appName=PetFinder";
+	"mongodb+srv://admin:admin@petfinder.h236iki.mongodb.net/?retryWrites=true&w=majority&appName=PetFinder";
 const client = new MongoClient(url);
 
 // HELPER FUNCTIONS
@@ -39,7 +39,6 @@ async function verifyPassword(inputPassword, hashedPassword) {
 			if (err) {
 				reject(err);
 			} else {
-				console.log(result);
 				resolve(result);
 			}
 		});
@@ -54,16 +53,14 @@ async function verifyUser(username, password) {
 	const users = database.collection("users");
 	const userExist = await userExists(users, username);
 	if (!userExist) {
-		console.log(AuthenticationErrors.userDoesNotExist);
-		return;
+		return AuthenticationErrors.userDoesNotExist;
 	}
 	const user = await getUser(users, username);
 	const passwordValid = await verifyPassword(password, user.password);
-	console.log(passwordValid);
 	if (passwordValid) {
-		console.log("valid username and password");
+		return "Valid username and password combination.";
 	} else {
-		console.log(AuthenticationErrors.invalidPassword);
+		return AuthenticationErrors.invalidPassword;
 	}
 }
 
@@ -73,13 +70,13 @@ async function createUserEntry(username, password) {
 	const users = database.collection("users");
 	const userExist = await userExists(users, username);
 	if (userExist) {
-		console.log(AuthenticationErrors.userAlreadyExists);
-		return;
+		return AuthenticationErrors.userAlreadyExists;
 	}
 	const hashedPassword = await encryptPassword(password);
 	const user = { username: username, password: hashedPassword };
 	await users.insertOne(user);
 	await client.close();
+	return `User ${username} has been added to the database.`;
 }
 
 module.exports = {
