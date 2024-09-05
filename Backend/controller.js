@@ -7,7 +7,7 @@ const {
 	createNewBadge,
 	addBadgeToUser,
 	getUserBadgeObjects,
-} = require("./badges");
+} = require("./badges/badges");
 
 function tester(req, res) {
 	// Controller logic goes here

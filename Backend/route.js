@@ -31,7 +31,6 @@ router.get("/", tester);
 
 /**
  * Adds username to database
- * @
  * @param username - username of user
  * @param password - password of user
  * @returns success string or error
