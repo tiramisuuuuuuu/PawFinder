@@ -1,10 +1,6 @@
-const { MongoClient } = require("mongodb");
+const { client } = require("../storageServices");
 const bcrypt = require("bcrypt");
 const { AuthenticationErrors } = require("./authenticationErrors");
-
-const url =
-	"mongodb+srv://admin:admin@petfinder.h236iki.mongodb.net/?retryWrites=true&w=majority&appName=PetFinder";
-const client = new MongoClient(url);
 
 // HELPER FUNCTIONS
 async function userExists(users, username) {
@@ -73,7 +69,7 @@ async function createUserEntry(username, password) {
 		return AuthenticationErrors.userAlreadyExists;
 	}
 	const hashedPassword = await encryptPassword(password);
-	const user = { username: username, password: hashedPassword };
+	const user = { username: username, password: hashedPassword, badges: [] };
 	await users.insertOne(user);
 	await client.close();
 	return `User ${username} has been added to the database.`;
