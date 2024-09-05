@@ -34,11 +34,11 @@ const authenticateUser = async (usr, pwd) => {
 		.then((message) => console.log(message));
 };
 
-const run = async () => {
+const authenticate = async () => {
 	let usr = "grace";
-	let pwd = "mochi";
+	let pwd = "grace";
 	await addUser(usr, pwd);
 	await authenticateUser(usr, pwd);
 };
 
-run();
+authenticate();

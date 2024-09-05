@@ -1,7 +1,13 @@
 const {
 	createUserEntry,
 	verifyUser,
-} = require("./Authentication/authentication");
+} = require("./authentication/authentication");
+
+const {
+	createNewBadge,
+	addBadgeToUser,
+	getUserBadgeObjects,
+} = require("./badges");
 
 function tester(req, res) {
 	// Controller logic goes here
@@ -18,9 +24,27 @@ async function authenticateUser(req, res) {
 	res.send(result);
 }
 
+async function addBadge(req, res) {
+	result = await createNewBadge(req.body.badgeName, req.file);
+	res.send(result);
+}
+
+async function addUserBadge(req, res) {
+	result = await addBadgeToUser(req.body.username, req.body.badgeName);
+	res.send(result);
+}
+
+async function getUserBadges(req, res) {
+	result = await getUserBadgeObjects(req.body.username, req.body.badgeName);
+	res.send(result);
+}
+
 // Export the controller function
 module.exports = {
 	tester,
 	addUser,
 	authenticateUser,
+	addBadge,
+	addUserBadge,
+	getUserBadges,
 };
