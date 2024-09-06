@@ -9,6 +9,13 @@ const {
 	getUserBadgeObjects,
 } = require("./badges/badges");
 
+const {
+	createPetProfile,
+	returnPetProfiles,
+} = require("./petprofile/petprofile");
+
+const { createSighting, returnSightings } = require("./sightings/sightings");
+
 function tester(req, res) {
 	// Controller logic goes here
 	res.send("Hello from tester!");
@@ -39,6 +46,39 @@ async function getUserBadges(req, res) {
 	res.send(result);
 }
 
+async function addPetProfile(req, res) {
+	result = await createPetProfile(
+		req.body.username,
+		req.body.petName,
+		req.body.petSpecies,
+		req.body.lastSeen,
+		req.body.petDescription,
+		req.body.assignedTasks
+	);
+	res.send(result);
+}
+
+async function getPetProfiles(req, res) {
+	result = await returnPetProfiles(req.body.username);
+	res.send(result);
+}
+
+async function addSighting(req, res) {
+	result = await createSighting(
+		req.body.username,
+		req.body.petID,
+		req.files,
+		req.body.description,
+		req.body.location
+	);
+	res.send(result);
+}
+
+async function getSightings(req, res) {
+	result = await returnSightings(req.body.username);
+	res.send(result);
+}
+
 // Export the controller function
 module.exports = {
 	tester,
@@ -47,4 +87,8 @@ module.exports = {
 	addBadge,
 	addUserBadge,
 	getUserBadges,
+	addPetProfile,
+	getPetProfiles,
+	addSighting,
+	getSightings,
 };

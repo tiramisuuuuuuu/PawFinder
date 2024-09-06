@@ -1,6 +1,5 @@
 const { client } = require("../storageServices");
 const bcrypt = require("bcrypt");
-const { AuthenticationErrors } = require("./authenticationErrors");
 
 // HELPER FUNCTIONS
 async function userExists(users, username) {
@@ -49,14 +48,14 @@ async function verifyUser(username, password) {
 	const users = database.collection("users");
 	const userExist = await userExists(users, username);
 	if (!userExist) {
-		return AuthenticationErrors.userDoesNotExist;
+		return "User does not exist. Create a new account.";
 	}
 	const user = await getUser(users, username);
 	const passwordValid = await verifyPassword(password, user.password);
 	if (passwordValid) {
 		return "Valid username and password combination.";
 	} else {
-		return AuthenticationErrors.invalidPassword;
+		return "Invalid password. Please try again";
 	}
 }
 
@@ -66,7 +65,7 @@ async function createUserEntry(username, password) {
 	const users = database.collection("users");
 	const userExist = await userExists(users, username);
 	if (userExist) {
-		return AuthenticationErrors.userAlreadyExists;
+		return "Username already taken. Choose another username.";
 	}
 	const hashedPassword = await encryptPassword(password);
 	const user = { username: username, password: hashedPassword, badges: [] };
