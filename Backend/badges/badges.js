@@ -1,7 +1,6 @@
 const { client, storage } = require("../storageServices");
 const { ref, uploadBytes, getDownloadURL } = require("firebase/storage");
 const fs = require("fs");
-const { url } = require("inspector");
 
 // HELPER FUNCTIONS
 async function addBadgeToDatabase(badgeName, badgeImageURL) {
@@ -14,6 +13,9 @@ async function addBadgeToDatabase(badgeName, badgeImageURL) {
 
 // MAIN FUNCTIONS
 async function createNewBadge(badgeName, badgePicture) {
+	if (!(badgeName && badgePicture)) {
+		return "Missing one or more parameters.";
+	}
 	const imageBuffer = fs.readFileSync(badgePicture.path);
 	const uint8Array = new Uint8Array(imageBuffer);
 	const badgeRef = ref(storage, `badges/${badgePicture.filename}`);
