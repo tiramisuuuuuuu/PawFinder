@@ -1,4 +1,4 @@
-import { View, ImageBackground, TextInput, Text, Pressable } from "react-native"
+import { View, ImageBackground, TextInput, Text, Pressable, Image } from "react-native"
 import { StyleSheet } from "react-native"
 import Octicons from '@expo/vector-icons/Octicons';
 import Foundation from '@expo/vector-icons/Foundation';
@@ -28,8 +28,8 @@ export default function SignIn() {
 
     return (
         <View style={{flex: 1, backgroundColor: 'white'}}>
-            <ImageBackground source={require('./signin_bg.png')} resizeMode="repeat"  tintColor="purple" style={styles.image_bg} imageStyle={{opacity: 0.1}}>
-                <Text style={{fontFamily: 'LilitaOne-Regular', fontSize: 24, margin: 15}}>Let's get started!</Text>
+            <ImageBackground source={require('./signin_bg.png')} resizeMode="repeat" style={styles.image_bg} imageStyle={{opacity: 0.7}}>
+                <Text style={{fontFamily: 'LilitaOne-Regular', fontSize: 24, marginBottom: 15, marginTop: 25}}>Let's get started!</Text>
                 <View style={styles.input_field}>
                     <Text style={styles.input_heading}>Username</Text>
                     <View style={styles.div_input}>
@@ -59,6 +59,12 @@ export default function SignIn() {
                     <MaterialCommunityIcons name="paw-outline" size={20} color="black" style={{transform: [{scaleY: 1.2}, {rotate: '15deg'}, {translateY: 5}]}} />
                     <Text style={{fontFamily: 'LilitaOne-Regular', fontSize: 17, marginLeft: 3}}>SIGN UP</Text>
                 </Pressable>
+                <View style={{marginTop: 15}}>
+                    <Text style={styles.input_heading}>Or continue with:</Text>
+                    <Pressable style={{justifyContent: 'center', alignItems: 'center'}}>
+                        <Image source={require("./google_icon.png")} resizeMode="contain" style={styles.alt_icon}/>
+                    </Pressable>
+                </View>
             </ImageBackground>
         </View>
     )
@@ -114,5 +120,12 @@ const styles = StyleSheet.create({
         backgroundColor: 'orange',
         borderRadius: 5,
         marginTop: 30,
+    },
+    alt_icon: {
+        width: 55,
+        height: 50,
+        marginTop: 15,
+        backgroundColor: "white",
+        borderRadius: 15
     }
 });
