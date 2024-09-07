@@ -1,10 +1,5 @@
-const { MongoClient } = require("mongodb");
+const { client } = require("../storageServices");
 const bcrypt = require("bcrypt");
-const { AuthenticationErrors } = require("./authenticationErrors");
-
-const url =
-	"mongodb+srv://gracechen56607:goweekend3210@petfinder.h236iki.mongodb.net/?retryWrites=true&w=majority&appName=PetFinder";
-const client = new MongoClient(url);
 
 // HELPER FUNCTIONS
 async function userExists(users, username) {
@@ -39,7 +34,6 @@ async function verifyPassword(inputPassword, hashedPassword) {
 			if (err) {
 				reject(err);
 			} else {
-				console.log(result);
 				resolve(result);
 			}
 		});
@@ -50,36 +44,34 @@ async function verifyPassword(inputPassword, hashedPassword) {
 
 async function verifyUser(username, password) {
 	await client.connect();
-	const database = client.db("users");
+	const database = client.db("petfinder");
 	const users = database.collection("users");
 	const userExist = await userExists(users, username);
 	if (!userExist) {
-		console.log(AuthenticationErrors.userDoesNotExist);
-		return;
+		return "User does not exist. Create a new account.";
 	}
 	const user = await getUser(users, username);
 	const passwordValid = await verifyPassword(password, user.password);
-	console.log(passwordValid);
 	if (passwordValid) {
-		console.log("valid username and password");
+		return "Valid username and password combination.";
 	} else {
-		console.log(AuthenticationErrors.invalidPassword);
+		return "Invalid password. Please try again";
 	}
 }
 
 async function createUserEntry(username, password) {
 	await client.connect();
-	const database = client.db("users");
+	const database = client.db("petfinder");
 	const users = database.collection("users");
 	const userExist = await userExists(users, username);
 	if (userExist) {
-		console.log(AuthenticationErrors.userAlreadyExists);
-		return;
+		return "Username already taken. Choose another username.";
 	}
 	const hashedPassword = await encryptPassword(password);
-	const user = { username: username, password: hashedPassword };
+	const user = { username: username, password: hashedPassword, badges: [] };
 	await users.insertOne(user);
 	await client.close();
+	return `User ${username} has been added to the database.`;
 }
 
 module.exports = {
