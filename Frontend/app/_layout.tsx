@@ -1,43 +1,33 @@
 import { Stack } from "expo-router"
-import { View, StyleSheet , Image} from "react-native"
 import * as SplashScreen from 'expo-splash-screen';
-import { useState, useEffect, useCallback, useContext } from "react";
+import { View, StyleSheet , Image} from "react-native"
+import { useState, useCallback } from "react";
 import { PageLoadContext } from './Context';
+
 
 SplashScreen.preventAutoHideAsync()
 
 export default function RootLayout() {
-    const [loaded, setLoaded] = useState(false);
+    const [pageIsReady, setPageIsReady] = useState(true);
 
-
-    useEffect(() => {
-        async function test() {
-            await new Promise(resolve => setTimeout(resolve, 5000));
-            setLoaded(true);
-        }
-        test();
-
-        }, []);
-
-    const loaded_callback = useCallback(async () => {
-        if (loaded == false) {
+    const pageIsReady_callback = useCallback(async () => {
+        if (pageIsReady == false) {
             SplashScreen.preventAutoHideAsync();
             }
         else {
             await SplashScreen.hideAsync();
             }
-        }, [loaded])
+        }, []);
+    
+    pageIsReady_callback();
 
-    if (loaded == false) {
-        return null
-    }
 
     return (
         <View style={{flex: 1}}>
             <View style={styles.header}>
                 <Image source={require('./pawfinder_header.png')} style={{flex: 1, resizeMode: 'contain'}}></Image>
             </View>
-            <PageLoadContext.Provider value={{loaded, setLoaded}}>
+            <PageLoadContext.Provider value={{pageIsReady, setPageIsReady}}>
                 <Stack screenOptions={{headerShown: false}}>
                     <Stack.Screen name="(signin)" />
                     <Stack.Screen name="dashboard" />

@@ -2,9 +2,23 @@ import { View, ImageBackground, TextInput, Text } from "react-native"
 import { StyleSheet } from "react-native"
 import Octicons from '@expo/vector-icons/Octicons';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import { useContext, useEffect } from "react";
+import { PageLoadContext } from "../Context";
+import { useFonts } from 'expo-font';
 
 
 export default function SignIn() {
+    const {pageIsReady, setPageIsReady} = useContext(PageLoadContext);
+    const [loaded, error] = useFonts("@/assets/fonts/LilitaOne-Regular.ttf");
+
+    useEffect(() => {
+        if (loaded || error) {
+            setPageIsReady(true);
+            }
+        else {
+            setPageIsReady(false);
+            }
+        }, [loaded, error]);
 
     return (
         <View style={{flex: 1, backgroundColor: 'white'}}>
@@ -79,6 +93,6 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
         fontSize: 13,
         color: 'grey',
+        fontFamily: 'Lato',
     }
 });
-
