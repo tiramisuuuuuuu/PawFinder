@@ -1,6 +1,7 @@
-import { View, ImageBackground, TextInput, Text } from "react-native"
+import { View, ImageBackground, TextInput, Text, Pressable } from "react-native"
 import { StyleSheet } from "react-native"
 import Octicons from '@expo/vector-icons/Octicons';
+import Foundation from '@expo/vector-icons/Foundation';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { useContext, useEffect } from "react";
 import { PageLoadContext } from "../Context";
@@ -9,7 +10,8 @@ import { useFonts } from 'expo-font';
 
 export default function SignIn() {
     const {pageIsReady, setPageIsReady} = useContext(PageLoadContext);
-    const [loaded, error] = useFonts("@/assets/fonts/LilitaOne-Regular.ttf");
+    const [loaded, error] = useFonts({
+        'LilitaOne-Regular': "../../assets/fonts/LilitaOne-Regular.ttf"});
 
     useEffect(() => {
         if (loaded || error) {
@@ -20,9 +22,14 @@ export default function SignIn() {
             }
         }, [loaded, error]);
 
+    function clickSignin_handler() {
+        
+    }
+
     return (
         <View style={{flex: 1, backgroundColor: 'white'}}>
-            <ImageBackground source={require('./signin_bg.png')} resizeMode="repeat" tintColor="#448da5" style={styles.image_bg}>
+            <ImageBackground source={require('./signin_bg.png')} resizeMode="repeat"  tintColor="purple" style={styles.image_bg} imageStyle={{opacity: 0.1}}>
+                <Text style={{fontFamily: 'LilitaOne-Regular', fontSize: 24, margin: 15}}>Let's get started!</Text>
                 <View style={styles.input_field}>
                     <Text style={styles.input_heading}>Username</Text>
                     <View style={styles.div_input}>
@@ -47,7 +54,11 @@ export default function SignIn() {
                         <Octicons name="lock" style={styles.icon} />
                         <TextInput placeholder="Confirm Password" style={styles.input} /></View></View>
                 
-                <MaterialCommunityIcons name="paw-outline" size={24} color="black" />
+                <Pressable onPress={()=>{clickSignin_handler()}} style={styles.bttn}>
+                    <MaterialCommunityIcons name="paw-outline" size={20} color="black" style={{transform: [{scaleY: 1.2}, {rotate: '-15deg'}, {translateY: -5}]}} />
+                    <MaterialCommunityIcons name="paw-outline" size={20} color="black" style={{transform: [{scaleY: 1.2}, {rotate: '15deg'}, {translateY: 5}]}} />
+                    <Text style={{fontFamily: 'LilitaOne-Regular', fontSize: 17, marginLeft: 3}}>SIGN UP</Text>
+                </Pressable>
             </ImageBackground>
         </View>
     )
@@ -76,7 +87,7 @@ const styles = StyleSheet.create({
         height: 35,
         backgroundColor: 'white',
         borderColor: '#448da5',
-        borderWidth: 1,
+        borderWidth: 2,
         borderRadius: 7,
         overflow: 'hidden',
         padding: 5,
@@ -93,6 +104,15 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
         fontSize: 13,
         color: 'grey',
-        fontFamily: 'Lato',
+    },
+    bttn: {
+        width: 130,
+        height: 40,
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'orange',
+        borderRadius: 5,
+        marginTop: 30,
     }
 });
