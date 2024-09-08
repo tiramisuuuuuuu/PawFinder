@@ -25,7 +25,7 @@ export default function RootLayout() {
     return (
         <View style={{flex: 1}}>
             <View style={styles.header}>
-                <Image source={require('./pawfinder_header.png')} style={{flex: 1, resizeMode: 'contain'}}></Image>
+                <Image source={require('./pawfinder_header.png')} style={{flex: 1, maxHeight: 100, resizeMode: 'contain'}}></Image>
             </View>
             <PageLoadContext.Provider value={{pageIsReady, setPageIsReady}}>
                 <Stack screenOptions={{headerShown: false}}>
@@ -40,8 +40,8 @@ export default function RootLayout() {
 const styles = StyleSheet.create({
     header: {
         width: '100%',
-        height: 100,
-        justifyContent: 'center',
+        height: 150,
+        justifyContent: 'flex-end',
         alignItems: 'center',
     },
 })
