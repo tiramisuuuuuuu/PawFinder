@@ -1,6 +1,6 @@
 import { createContext } from 'react';
 
-export const PageLoadContext = createContext({
-    pageIsReady: false,
-    setPageIsReady: (prev)=>{}
+export const SplashContext = createContext({
+    showSplash: false,
+    setShowSplash: (val)=>{}
 })
