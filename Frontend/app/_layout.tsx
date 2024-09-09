@@ -1,7 +1,8 @@
 import { Stack } from "expo-router"
 import * as SplashScreen from 'expo-splash-screen';
+import { useFonts } from "expo-font";
 import { View, StyleSheet , Image} from "react-native"
-import { useState, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { PageLoadContext } from './Context';
 
 
@@ -9,6 +10,20 @@ SplashScreen.preventAutoHideAsync()
 
 export default function RootLayout() {
     const [pageIsReady, setPageIsReady] = useState(true);
+
+    const [loaded, error] = useFonts({
+        'LilitaOne-Regular': require('../assets/fonts/LilitaOne-Regular.ttf'),
+        'Poppins-Regular': require('../assets/fonts/Poppins-Regular.ttf')});
+    
+    useEffect(() => {
+        if (loaded || error) {
+            if (error) { console.log(error) }
+            setPageIsReady(true);
+            }
+        else {
+            setPageIsReady(false);
+            }
+        }, [loaded, error]);
 
     const pageIsReady_callback = useCallback(async () => {
         if (pageIsReady == false) {
@@ -20,8 +35,6 @@ export default function RootLayout() {
         }, []);
     
     pageIsReady_callback();
-
-
     return (
         <View style={{flex: 1}}>
             <View style={styles.header}>
