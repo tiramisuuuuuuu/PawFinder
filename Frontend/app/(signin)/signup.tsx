@@ -1,19 +1,13 @@
-import { useFonts } from 'expo-font';
 import { View, TextInput, Text, Image, TouchableOpacity, ActivityIndicator, Pressable } from "react-native"
-import { useContext, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { styles } from "./styles";
 import InputField from "./InputField";
 import { router } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { PageLoadContext } from "../Context";
 
 
 export default function SignIn() {
-    const {pageIsReady, setPageIsReady} = useContext(PageLoadContext);
-    const [loaded, error] = useFonts({
-        'LilitaOne-Regular': require('../../assets/fonts/LilitaOne-Regular.ttf'),
-        'Poppins-Regular': require('../../assets/fonts/Poppins-Regular.ttf')});
     const [loading, setLoading] = useState(false);
     const username = useRef("");
     const email = useRef("");
@@ -23,16 +17,6 @@ export default function SignIn() {
     let emptyParams = [];
     if (errorObj.hasOwnProperty('emptyParams')) { emptyParams = errorObj.emptyParams }
     
-
-    useEffect(() => {
-        if (loaded || error) {
-            if (error) { console.log(error) }
-            setPageIsReady(true);
-            }
-        else {
-            setPageIsReady(false);
-            }
-        }, [loaded, error]);
     
     useEffect(() => {
         async function sign_up() {
