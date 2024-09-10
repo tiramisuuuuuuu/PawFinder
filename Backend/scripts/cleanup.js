@@ -8,7 +8,6 @@ function deleteStaleImages() {
 			const filePath = path.join(imageLocation, file);
 
 			fs.stat(filePath, (err, stats) => {
-				console.log(file, stats);
 				currentTime = Date.now();
 
 				const fileAge = currentTime - stats.birthtimeMs;
