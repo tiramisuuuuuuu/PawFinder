@@ -1,4 +1,4 @@
-const { client, storage } = require("../storageServices");
+const { client, storage } = require("./storageServices");
 const { ref, uploadBytes, getDownloadURL } = require("firebase/storage");
 const fs = require("fs");
 const { mongoose } = require("mongoose");
@@ -73,12 +73,13 @@ async function getUserBadgeObjects(userToken) {
 	}
 
 	badgeObjects = [];
-	for (const badgeToken of user.badges) {
-		badge = await badges.findOne({
-			_id: new mongoose.Types.ObjectId(badgeToken),
-		});
-		badgeObjects.push(badge);
-	}
+	const badgeObjects = await Promise.all(
+		user.badges.map(async (badgeToken) => {
+			return await badges.findOne({
+				_id: new mongoose.Types.ObjectId(badgeToken),
+			});
+		})
+	);
 
 	return badgeObjects;
 }

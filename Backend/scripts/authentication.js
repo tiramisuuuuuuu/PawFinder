@@ -1,4 +1,4 @@
-const { client } = require("../storageServices");
+const { client } = require("./storageServices");
 const bcrypt = require("bcrypt");
 
 // HELPER FUNCTIONS

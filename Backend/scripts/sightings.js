@@ -1,5 +1,5 @@
 const { response } = require("express");
-const { client, storage } = require("../storageServices");
+const { client, storage } = require("./storageServices");
 const { ref, uploadBytes, getDownloadURL } = require("firebase/storage");
 const fs = require("fs");
 const { mongoose } = require("mongoose");
