@@ -39,7 +39,7 @@ router.get("/", tester);
  * @paramtype raw json
  * @param username - username of user
  * @param password - password of user
- * @returns success string or error
+ * @returns user token or error
  */
 router.post("/addUser", addUser);
 
@@ -48,7 +48,7 @@ router.post("/addUser", addUser);
  * @paramtype raw json
  * @param username - username of user
  * @param password - password of user
- * @returns success string or error
+ * @returns user token or error
  */
 router.post("/authenticateUser", authenticateUser);
 
@@ -56,54 +56,54 @@ router.post("/authenticateUser", authenticateUser);
  * Adds a new badge type to the database
  * @paramtype form data
  * @param badgeName - name of badge
- * @param badgePicture - picture of badge
- * @returns success string or error
+ * @param badgeImage - picture of badge
+ * @returns badge token or error
  */
 router.post("/addBadge", upload.single("badgeImage"), addBadge);
 
 /**
  * Adds a badge to the user
  * @paramtype raw json
- * @param username - name of user
- * @param badgeName - name of badge
- * @returns success string or error
+ * @param userToken - token of user
+ * @param badgeToken - token of badge to add
+ * @returns success or error
  */
 router.post("/addUserBadge", addUserBadge);
 
 /**
  * Gets all the badges of an user
  * @paramtype raw json
- * @param username - name of user
- * @returns array of badge objects
+ * @param userToken - token of user
+ * @returns array of badge objects or error
  */
 router.post("/getUserBadges", getUserBadges);
 
 /**
  * Add missing pet profile
  * @paramtype raw json
- * @param username - user that's adding the profile
+ * @param userToken - token of user that's adding the profile
  * @param petName - name of pet
  * @param petSpecies - species of pet
  * @param lastSeen - location the pet was last seen
  * @param petDescription - description of the pet
  * @param assignedTasks - tasks assigned
- * @returns Success or error message
+ * @returns pet profile token
  */
 router.post("/addPetProfile", addPetProfile);
 
 /**
  * Gets all the pet profiles attached to the user
  * @paramtype raw json
- * @param username - user to get the pet profiles of
- * @returns Pet profile objects
+ * @param userToken - token of user to get the pet profiles of
+ * @returns List of pet profile objects or error
  */
 router.post("/getPetProfiles", getPetProfiles);
 
 /**
  * Adds a sighting of a pet
  * @paramtype form data
- * @param username - user that is adding the sighting
- * @param petID - the id of the pet the sighting is for
+ * @param userToken - token of user that is adding the sighting
+ * @param petToken - the id of the pet the sighting is for
  * @param photos - photos of the sighting
  * @param description - description of the sighting
  * @param location - location of where sighting occured
@@ -114,7 +114,7 @@ router.post("/addSighting", upload.array("photos", 10), addSighting);
 /**
  * Gets sightings of a user
  * @paramtype raw json
- * @param username - user to get sightings of
+ * @param userToken - token of user to get sightings of
  * @returns - list of sighting objects
  */
 router.post("/getSightings", getSightings);

@@ -1,20 +1,20 @@
 const {
 	createUserEntry,
 	verifyUser,
-} = require("./authentication/authentication");
+} = require("./scripts/authentication");
 
 const {
 	createNewBadge,
 	addBadgeToUser,
 	getUserBadgeObjects,
-} = require("./badges/badges");
+} = require("./scripts/badges");
 
 const {
 	createPetProfile,
 	returnPetProfiles,
-} = require("./petprofile/petprofile");
+} = require("./scripts/petprofile");
 
-const { createSighting, returnSightings } = require("./sightings/sightings");
+const { createSighting, returnSightings } = require("./scripts/sightings");
 
 function tester(req, res) {
 	// Controller logic goes here
@@ -37,18 +37,18 @@ async function addBadge(req, res) {
 }
 
 async function addUserBadge(req, res) {
-	result = await addBadgeToUser(req.body.username, req.body.badgeName);
+	result = await addBadgeToUser(req.body.userToken, req.body.badgeToken);
 	res.send(result);
 }
 
 async function getUserBadges(req, res) {
-	result = await getUserBadgeObjects(req.body.username, req.body.badgeName);
+	result = await getUserBadgeObjects(req.body.userToken);
 	res.send(result);
 }
 
 async function addPetProfile(req, res) {
 	result = await createPetProfile(
-		req.body.username,
+		req.body.userToken,
 		req.body.petName,
 		req.body.petSpecies,
 		req.body.lastSeen,
@@ -59,14 +59,14 @@ async function addPetProfile(req, res) {
 }
 
 async function getPetProfiles(req, res) {
-	result = await returnPetProfiles(req.body.username);
+	result = await returnPetProfiles(req.body.userToken);
 	res.send(result);
 }
 
 async function addSighting(req, res) {
 	result = await createSighting(
-		req.body.username,
-		req.body.petID,
+		req.body.userToken,
+		req.body.petToken,
 		req.files,
 		req.body.description,
 		req.body.location
@@ -75,7 +75,7 @@ async function addSighting(req, res) {
 }
 
 async function getSightings(req, res) {
-	result = await returnSightings(req.body.username);
+	result = await returnSightings(req.body.userToken);
 	res.send(result);
 }
 
