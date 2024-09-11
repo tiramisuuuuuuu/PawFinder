@@ -1,5 +1,5 @@
 
-import { ScrollView, View, StyleSheet } from "react-native"
+import { ScrollView, View, StyleSheet, Pressable, Text } from "react-native"
 import { useEffect, useState } from "react";
 import * as Location from 'expo-location';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -16,15 +16,23 @@ export default function Home() {
 
 
     return (
-        <ScrollView contentContainerStyle={styles.tab_bar}>
-            yeehaw
-        </ScrollView>
+        <View style={{flex: 1}}>
+            <ScrollView contentContainerStyle={styles.container}>
+                <Pressable style={{backgroundColor: 'orange', borderWidth: 2, borderColor: 'blue', padding: 10, margin: 100}}>
+                <Text> pet profile link</Text>
+                </Pressable>
+            </ScrollView>
+        </View>
     )
 }
 
 const styles = StyleSheet.create({
-    tab_bar: {
+    container: {
         flex: 1,
-        backgroundColor: 'purple',
-    }
+        borderTopLeftRadius: 40,
+        borderTopRightRadius: 40,
+        backgroundColor: '#e0e0e0',
+        overflow: "hidden",
+        alignItems: 'center',
+    },
 });
