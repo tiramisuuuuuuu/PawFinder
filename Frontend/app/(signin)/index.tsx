@@ -2,7 +2,7 @@ import { View, ScrollView, TextInput, Text, Image, TouchableOpacity, ActivityInd
 import { useEffect, useRef, useState } from "react";
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { styles } from "./styles";
-import InputField from "./InputField";
+import InputField from "../../components/InputField";
 import { Link, router } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -46,7 +46,7 @@ export default function SignIn() {
     if (loading) { return <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}><ActivityIndicator /></View> }
     return (
         <View style={{flex: 1, backgroundColor: 'white'}}>
-            <ScrollView style={styles.container} contentContainerStyle={{alignItems: 'center'}}>
+            <ScrollView contentContainerStyle={styles.container}>
                 {emptyParams.length>0 && <Text style={styles.error}>Missing one or more parameters.</Text>}
                 {errorObj.hasOwnProperty('usernameTaken') && <Text style={styles.error}>Username already taken. Choose another username.</Text>}
                 <Text style={{fontFamily: 'LilitaOne-Regular', fontSize: 37, marginBottom: 25, marginTop: 100, width: 310, textAlign: 'left'}}>Welcome,</Text>

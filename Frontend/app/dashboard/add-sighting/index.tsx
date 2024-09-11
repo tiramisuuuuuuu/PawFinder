@@ -2,7 +2,7 @@
 import { ScrollView, View, StyleSheet } from "react-native"
 
 
-export default function MapPage() {
+export default function AddSightingPage() {
 
     return (
         <View style={{flex: 1}}>
