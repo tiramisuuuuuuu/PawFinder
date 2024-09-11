@@ -53,8 +53,12 @@ async function verifyUser(username, password) {
 	}
 }
 
-async function createUserEntry(username, password) {
+async function createUserEntry(username, email, password, confirmPassword) {
 	const response = {};
+	if (password !== confirmPassword) {
+		response.error = "Password and confirm password does not match.";
+		return response;
+	}
 	await client.connect();
 	const database = client.db("petfinder");
 	const users = database.collection("users");
@@ -64,7 +68,12 @@ async function createUserEntry(username, password) {
 		return response;
 	}
 	const hashedPassword = await encryptPassword(password);
-	const user = { username: username, password: hashedPassword, badges: [] };
+	const user = {
+		username: username,
+		email: email,
+		password: hashedPassword,
+		badges: [],
+	};
 	const inserted = await users.insertOne(user);
 	response.token = inserted.insertedId;
 	await client.close();
