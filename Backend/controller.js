@@ -22,7 +22,12 @@ function tester(req, res) {
 }
 
 async function addUser(req, res) {
-	result = await createUserEntry(req.body.username, req.body.password);
+	result = await createUserEntry(
+		req.body.username,
+		req.body.email,
+		req.body.password,
+		req.body.confirmPassword
+	);
 	res.send(result);
 }
 

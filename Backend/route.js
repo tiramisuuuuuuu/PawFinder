@@ -47,7 +47,9 @@ router.post("/addUser", addUser);
  * Checks if username/password combo is in database
  * @paramtype raw json
  * @param username - username of user
+ * @param email - email of user
  * @param password - password of user
+ * @param confirmPassword - second password input from user
  * @returns user token or error
  */
 router.post("/authenticateUser", authenticateUser);
