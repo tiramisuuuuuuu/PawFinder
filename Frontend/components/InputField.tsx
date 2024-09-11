@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet } from "react-native";
 import Octicons from '@expo/vector-icons/Octicons';
-import { styles } from "./styles";
+import { styles } from "./InputField_styles";
 
 export default function InputField({children, header, iconName, redBox, displayErrorMsg, ...props}) {
     return (
