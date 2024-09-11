@@ -1,19 +1,13 @@
-import { useFonts } from 'expo-font';
-import { View, TextInput, Text, Image, TouchableOpacity, ActivityIndicator, Pressable } from "react-native"
-import { useContext, useEffect, useRef, useState } from "react";
+import { View, ScrollView, TextInput, Text, Image, TouchableOpacity, ActivityIndicator } from "react-native"
+import { useEffect, useRef, useState } from "react";
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { styles } from "./styles";
-import InputField from "./InputField";
-import { router } from 'expo-router';
+import InputField from "../../components/InputField";
+import { Link, router } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { PageLoadContext } from "../Context";
 
 
 export default function SignIn() {
-    const {pageIsReady, setPageIsReady} = useContext(PageLoadContext);
-    const [loaded, error] = useFonts({
-        'LilitaOne-Regular': require('../../assets/fonts/LilitaOne-Regular.ttf'),
-        'Poppins-Regular': require('../../assets/fonts/Poppins-Regular.ttf')});
     const [loading, setLoading] = useState(false);
     const username = useRef("");
     const email = useRef("");
@@ -23,21 +17,11 @@ export default function SignIn() {
     let emptyParams = [];
     if (errorObj.hasOwnProperty('emptyParams')) { emptyParams = errorObj.emptyParams }
     
-
-    useEffect(() => {
-        if (loaded || error) {
-            if (error) { console.log(error) }
-            setPageIsReady(true);
-            }
-        else {
-            setPageIsReady(false);
-            }
-        }, [loaded, error]);
     
     useEffect(() => {
         async function sign_up() {
             //-----------------add sign up function here, plus error handling (setErrorObj)
-            await AsyncStorage.setItem(['token', 12345]);
+            await AsyncStorage.setItem('token', '12345');
             router.replace("/dashboard");
             setLoading(false);
         }
@@ -72,14 +56,11 @@ export default function SignIn() {
     if (loading) { return <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}><ActivityIndicator /></View> }
     return (
         <View style={{flex: 1, backgroundColor: 'white'}}>
-            <View style={styles.container}>
-                {emptyParams.length>0 && <Text style={styles.error}>Missing one or more paramters.</Text>}
+            <ScrollView contentContainerStyle={styles.container}>
+                {emptyParams.length>0 && <Text style={styles.error}>Missing one or more parameters.</Text>}
                 {errorObj.hasOwnProperty('usernameTaken') && <Text style={styles.error}>Username already taken. Choose another username.</Text>}
-                <Pressable onPressIn={()=>{router.back()}} style={{alignSelf: 'flex-start', flexDirection: 'row', marginTop: 15, marginLeft: 50}}>
-                    <MaterialCommunityIcons name="arrow-left" size={24} color="blue" />
-                    <Text style={{color: 'blue', fontSize: 18}}>Back</Text></Pressable>
 
-                <Text style={{fontFamily: 'LilitaOne-Regular', fontSize: 24, marginBottom: 15, marginTop: 15}}>Let's get started!</Text>
+                <Text style={{fontFamily: 'LilitaOne-Regular', fontSize: 24, marginBottom: 15, marginTop: 35}}>Let's get started!</Text>
                 
                 <InputField header="Username" iconName="person" redBox={emptyParams.includes("username")} displayErrorMsg={false}>
                     <TextInput placeholder="Username" onChangeText={(newText)=>{username.current=newText}} style={styles.input} />
@@ -96,19 +77,23 @@ export default function SignIn() {
                 <InputField header="Password" iconName="lock" redBox={emptyParams.includes("confirm_password")} displayErrorMsg={errorObj.hasOwnProperty('unmatchedPasswords')} errorMsg="*Passwords do not match*">
                     <TextInput placeholder="Confirm Password" secureTextEntry={true} onChangeText={(newText)=>{confirm_password.current=newText}} style={styles.input} />
                     </InputField>
-                
+
+                <Text style={[styles.input_heading, {color: 'black', width: 310, textAlign: 'right'}]}>
+                    <Text>Already have an account ? </Text>
+                    <Link push href="/"><Text style={{color: 'blue', textDecorationLine: 'underline'}}>Login</Text></Link></Text>
+
                 <TouchableOpacity onPressIn={()=>{clickSignup_handler()}} style={styles.bttn}>
                     <MaterialCommunityIcons name="paw-outline" size={20} color="black" style={{transform: [{scaleY: 1.2}, {rotate: '-15deg'}, {translateY: -5}]}} />
                     <MaterialCommunityIcons name="paw-outline" size={20} color="black" style={{transform: [{scaleY: 1.2}, {rotate: '15deg'}, {translateY: 5}]}} />
                     <Text style={{fontFamily: 'LilitaOne-Regular', fontSize: 17, marginLeft: 3}}>SIGN UP</Text>
                     </TouchableOpacity>
-                <View style={{marginTop: 15}}>
+                <View style={{marginTop: 15, marginBottom: 20}}>
                     <Text style={styles.input_heading}>Or continue with:</Text>
                     <TouchableOpacity style={{justifyContent: 'center', alignItems: 'center'}}>
                         <Image source={require("./google_icon.png")} resizeMode="contain" style={styles.alt_icon}/>
                     </TouchableOpacity>
                 </View>
-            </View>
+            </ScrollView>
         </View>
     )
 }

@@ -1,13 +1,16 @@
+import { useLocalSearchParams } from "expo-router";
+import { ScrollView, View, StyleSheet, Text } from "react-native"
+import BackButton from "@/components/BackButton";
 
-import { ScrollView, View, StyleSheet } from "react-native"
 
-
-export default function MapPage() {
+export default function Home() {
+    const { id } = useLocalSearchParams();
 
     return (
         <View style={{flex: 1}}>
             <ScrollView contentContainerStyle={styles.container}>
-                yeehaw
+                <BackButton />
+                <Text>Pet profile</Text>
             </ScrollView>
         </View>
     )
@@ -20,5 +23,6 @@ const styles = StyleSheet.create({
         borderTopRightRadius: 40,
         backgroundColor: '#e0e0e0',
         overflow: "hidden",
+        alignItems: 'center'
     },
 });

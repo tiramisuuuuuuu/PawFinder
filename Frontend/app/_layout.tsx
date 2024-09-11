@@ -1,17 +1,32 @@
 import { Stack } from "expo-router"
 import * as SplashScreen from 'expo-splash-screen';
+import { useFonts } from "expo-font";
 import { View, StyleSheet , Image} from "react-native"
-import { useState, useCallback } from "react";
-import { PageLoadContext } from './Context';
+import { useState, useEffect, useCallback } from "react";
+import { SplashContext } from './Context';
 
 
 SplashScreen.preventAutoHideAsync()
 
 export default function RootLayout() {
-    const [pageIsReady, setPageIsReady] = useState(true);
+    const [showSplash, setShowSplash] = useState(true);
 
-    const pageIsReady_callback = useCallback(async () => {
-        if (pageIsReady == false) {
+    const [loaded, error] = useFonts({
+        'LilitaOne-Regular': require('../assets/fonts/LilitaOne-Regular.ttf'),
+        'Poppins-Regular': require('../assets/fonts/Poppins-Regular.ttf')});
+    
+    useEffect(() => {
+        if (loaded || error) {
+            if (error) { console.log(error) }
+            setShowSplash(true);
+            }
+        else {
+            setShowSplash(false);
+            }
+        }, [loaded, error]);
+
+    const appIsReady_callback = useCallback(async () => {
+        if (showSplash == false) {
             SplashScreen.preventAutoHideAsync();
             }
         else {
@@ -19,20 +34,18 @@ export default function RootLayout() {
             }
         }, []);
     
-    pageIsReady_callback();
-
-
+    appIsReady_callback();
     return (
         <View style={{flex: 1}}>
             <View style={styles.header}>
                 <Image source={require('./pawfinder_header.png')} style={{flex: 1, maxHeight: 100, resizeMode: 'contain'}}></Image>
             </View>
-            <PageLoadContext.Provider value={{pageIsReady, setPageIsReady}}>
+            <SplashContext.Provider value={{showSplash, setShowSplash}}>
                 <Stack screenOptions={{headerShown: false}}>
                     <Stack.Screen name="(signin)" />
                     <Stack.Screen name="dashboard" />
                 </Stack>
-            </PageLoadContext.Provider>
+            </SplashContext.Provider>
         </View>
     )
 }
