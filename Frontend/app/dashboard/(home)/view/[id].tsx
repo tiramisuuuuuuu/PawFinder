@@ -19,10 +19,7 @@ export default function Home() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        borderTopLeftRadius: 40,
-        borderTopRightRadius: 40,
         backgroundColor: '#e0e0e0',
-        overflow: "hidden",
         alignItems: 'center'
     },
 });
