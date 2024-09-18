@@ -55,7 +55,7 @@ export default function SignIn() {
 
     if (loading) { return <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}><ActivityIndicator /></View> }
     return (
-        <View style={{flex: 1, backgroundColor: 'white'}}>
+        <View style={{flex: 1, backgroundColor: '#e0e0e0'}}>
             <ScrollView contentContainerStyle={styles.container}>
                 {emptyParams.length>0 && <Text style={styles.error}>Missing one or more parameters.</Text>}
                 {errorObj.hasOwnProperty('usernameTaken') && <Text style={styles.error}>Username already taken. Choose another username.</Text>}

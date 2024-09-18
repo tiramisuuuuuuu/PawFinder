@@ -12,6 +12,8 @@ const {
 	getPetProfiles,
 	addSighting,
 	getSightings,
+	getAutocomplete,
+	getLocation,
 } = require("./controller.js");
 
 const router = express.Router();
@@ -118,5 +120,14 @@ router.post("/addSighting", upload.array("photos", 10), addSighting);
  * @returns - list of sighting objects
  */
 router.post("/getSightings", getSightings);
+
+/**
+ * Gets nearest location of given lat and lang
+ * @paramtype raw json
+ * @param latitude - latitude as a type number
+ * @param longitude - longitude as a type number
+ * @returns - a place
+ */
+router.post("/getLocation", getLocation);
 
 module.exports = router;

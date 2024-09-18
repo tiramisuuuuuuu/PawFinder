@@ -1,5 +1,5 @@
 
-import { ScrollView, View, StyleSheet } from "react-native"
+import { ScrollView, View, StyleSheet, Text } from "react-native"
 
 
 export default function AddSightingPage() {
@@ -7,7 +7,7 @@ export default function AddSightingPage() {
     return (
         <View style={{flex: 1}}>
             <ScrollView contentContainerStyle={styles.container}>
-                yeehaw
+                <Text>yeehaw</Text>
             </ScrollView>
         </View>
     )
