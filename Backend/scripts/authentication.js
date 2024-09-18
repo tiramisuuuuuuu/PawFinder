@@ -1,15 +1,7 @@
-const { client } = require("../storageServices");
+const { client } = require("./storageServices");
 const bcrypt = require("bcrypt");
 
 // HELPER FUNCTIONS
-async function userExists(users, username) {
-	const document = await users.findOne({ username: username });
-	if (document === null) {
-		return false;
-	}
-	return true;
-}
-
 async function getUser(users, username) {
 	const document = await users.findOne({ username: username });
 	return document;
@@ -41,37 +33,51 @@ async function verifyPassword(inputPassword, hashedPassword) {
 }
 
 // MAIN FUNCTIONS
-
 async function verifyUser(username, password) {
+	const response = {};
 	await client.connect();
 	const database = client.db("petfinder");
 	const users = database.collection("users");
-	const userExist = await userExists(users, username);
-	if (!userExist) {
-		return "User does not exist. Create a new account.";
-	}
 	const user = await getUser(users, username);
+	if (user === null) {
+		response.error = "User does not exist. Create a new account.";
+		return response;
+	}
 	const passwordValid = await verifyPassword(password, user.password);
 	if (passwordValid) {
-		return "Valid username and password combination.";
+		response.token = user._id.toString();
+		return response;
 	} else {
-		return "Invalid password. Please try again";
+		response.error = "Invalid password. Please try again";
+		return response;
 	}
 }
 
-async function createUserEntry(username, password) {
+async function createUserEntry(username, email, password, confirmPassword) {
+	const response = {};
+	if (password !== confirmPassword) {
+		response.error = "Password and confirm password does not match.";
+		return response;
+	}
 	await client.connect();
 	const database = client.db("petfinder");
 	const users = database.collection("users");
-	const userExist = await userExists(users, username);
-	if (userExist) {
-		return "Username already taken. Choose another username.";
+	const userObj = await getUser(users, username);
+	if (userObj) {
+		response.error = "User aleady exist. Choose a different username.";
+		return response;
 	}
 	const hashedPassword = await encryptPassword(password);
-	const user = { username: username, password: hashedPassword, badges: [] };
-	await users.insertOne(user);
+	const user = {
+		username: username,
+		email: email,
+		password: hashedPassword,
+		badges: [],
+	};
+	const inserted = await users.insertOne(user);
+	response.token = inserted.insertedId;
 	await client.close();
-	return `User ${username} has been added to the database.`;
+	return response;
 }
 
 module.exports = {

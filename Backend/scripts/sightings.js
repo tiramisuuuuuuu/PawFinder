@@ -1,6 +1,8 @@
-const { client, storage } = require("../storageServices");
+const { response } = require("express");
+const { client, storage } = require("./storageServices");
 const { ref, uploadBytes, getDownloadURL } = require("firebase/storage");
 const fs = require("fs");
+const { mongoose } = require("mongoose");
 
 // HELPER FUNCTIONS
 async function getPhotoUrls(photos) {
@@ -13,15 +15,22 @@ async function getPhotoUrls(photos) {
 		const url = await getDownloadURL(photoRef);
 		urls.push(url);
 	}
-	console.log("urls", urls);
 	return urls;
 }
 
 // MAIN FUNCTIONS
-async function createSighting(username, petID, photos, description, location) {
-	const requiredFields = [username, petID, photos, description, location];
+async function createSighting(
+	userToken,
+	petToken,
+	photos,
+	description,
+	location
+) {
+	const repsonse = {};
+	const requiredFields = [userToken, petToken, photos, description, location];
 	if (requiredFields.includes(undefined) || requiredFields.includes(null)) {
-		return "Missing one or more parameters.";
+		response.error = "Missing one or more parameters.";
+		return response;
 	}
 
 	await client.connect();
@@ -30,31 +39,36 @@ async function createSighting(username, petID, photos, description, location) {
 	const date = new Date().toLocaleDateString();
 	const urls = await getPhotoUrls(photos);
 	const sighting = {
-		username: username,
-		petID: petID,
+		userToken: userToken,
+		petID: petToken,
 		photos: urls,
 		description: description,
 		location: location,
 		date: date,
 	};
-	await sightings.insertOne(sighting);
+	const sightingObj = await sightings.insertOne(sighting);
+	response.token = sightingObj.insertedId;
 	await client.close();
-	return `Sighting has been added to the database.`;
+	return response;
 }
 
-async function returnSightings(username) {
+async function returnSightings(userToken) {
+	const response = {};
 	await client.connect();
 	const database = client.db("petfinder");
 	const users = database.collection("users");
 	const sightings = database.collection("sightings");
 
-	const user = await users.findOne({ username: username });
+	const user = await users.findOne({
+		_id: new mongoose.Types.ObjectId(userToken),
+	});
 	if (!user) {
-		return "No user with the username found.";
+		response.error = "No user with the username found.";
+		return response;
 	}
 
 	const sightingObjects = await sightings
-		.find({ username: username })
+		.find({ userToken: userToken })
 		.toArray();
 	await client.close();
 	return sightingObjects;
