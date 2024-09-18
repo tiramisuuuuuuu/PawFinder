@@ -1,9 +1,11 @@
 
 import { ScrollView, View, StyleSheet, Pressable, Text, TextInput } from "react-native"
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import * as Location from 'expo-location';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import PlacesSearch from "@/components/PlacesSearch";
+import LoadingScreen from "@/components/LoadingScreen";
 
 function ZipCodeSearch({ setLocation }) {
     const [inputNull, setInputNull] = useState(false);
@@ -26,30 +28,52 @@ function ZipCodeSearch({ setLocation }) {
 }
 
 export default function Home() {
-    const [location, setLocation] = useState("95616");
+    const [latLng, setLatLng] = useState("34.0549, 118.2426");
+    const initialLatLng = useRef("");
 
-    async function getCurrLocation() {
+    async function getCurrLocation() {                                                                                                                    
         let { status } = await Location.requestForegroundPermissionsAsync();
         if (status !== 'granted') {
-            console.log('Permission to access location was denied');
-            return null;
-            }
-
-        let curr_loc = (await Location.getCurrentPositionAsync({})).coords;
-        console.log(curr_loc.latitude);
-        console.log(curr_loc.longitude);
-    }
-
+          console.log('Permission to access location was denied');
+          return "";
+        }
+    
+        let pos = (await Location.getCurrentPositionAsync({})).coords;
+        let geocode = `${pos.latitude}, ${pos.longitude}`;
+        await AsyncStorage.setItem('latlng', geocode);
+        await AsyncStorage.setItem('last_search_latlng', geocode);
+        return geocode;
+      }
+    
     useEffect(()=>{
-        getCurrLocation()
+        async function initializeSearch() {
+            let value = await AsyncStorage.getItem('last_search_latlng');
+            if (value != null) {
+                initialLatLng.current = value;
+                setLatLng(value);
+            }
+            else {
+                let geocode = await getCurrLocation();
+                if (geocode != "") {
+                    initialLatLng.current = geocode;
+                    setLatLng(geocode);
+                }
+                else {
+                    initialLatLng.current = latLng;
+                }
+                
+            }
+        }
+        
+        initializeSearch();
     }, [])
 
-
+    if (latLng == "") { return <LoadingScreen /> }
     return (
-        <View style={{flex: 1, backgroundColor: 'white'}}>
+        <View style={{flex: 1, backgroundColor: '#f1f3f9'}}>
             <ScrollView contentContainerStyle={styles.container}>
                 <View style={{width: 300, paddingTop: 50}}>
-                    <ZipCodeSearch setLocation={setLocation} />
+                    <PlacesSearch initialLatLng={initialLatLng.current} setLatLng={setLatLng} />
                 </View>
             </ScrollView>
         </View>
@@ -59,7 +83,6 @@ export default function Home() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#f1f3f9',
         alignItems: 'center',
     },
 });

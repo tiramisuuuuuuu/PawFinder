@@ -1,5 +1,5 @@
 
-import { ScrollView, View, StyleSheet } from "react-native"
+import { ScrollView, View, Text, StyleSheet } from "react-native"
 
 
 export default function MapPage() {
@@ -7,7 +7,7 @@ export default function MapPage() {
     return (
         <View style={{flex: 1}}>
             <ScrollView contentContainerStyle={styles.container}>
-                yeehaw
+                <Text>yeehaw</Text>
             </ScrollView>
         </View>
     )

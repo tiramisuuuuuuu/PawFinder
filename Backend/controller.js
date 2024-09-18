@@ -14,7 +14,15 @@ const {
 	returnPetProfiles,
 } = require("./scripts/petprofile");
 
-const { createSighting, returnSightings } = require("./scripts/sightings");
+const { 
+	createSighting,
+	returnSightings 
+} = require("./sightings/sightings");
+
+const {
+	returnLocation,
+} = require("./google/maps");
+
 
 function tester(req, res) {
 	// Controller logic goes here
@@ -84,6 +92,11 @@ async function getSightings(req, res) {
 	res.send(result);
 }
 
+async function getLocation(req, res) {
+	result = await returnLocation(req.body.latitude, req.body.longitude);
+	res.send(result);
+}
+
 // Export the controller function
 module.exports = {
 	tester,
@@ -96,4 +109,5 @@ module.exports = {
 	getPetProfiles,
 	addSighting,
 	getSightings,
+	getLocation,
 };
