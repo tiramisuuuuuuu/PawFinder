@@ -35,6 +35,15 @@ async function verifyPassword(inputPassword, hashedPassword) {
 // MAIN FUNCTIONS
 async function verifyUser(username, password) {
 	const response = {};
+	const requiredFields = [username, password];
+	if (
+		requiredFields.includes(undefined) ||
+		requiredFields.includes(null) ||
+		requiredFields.includes("")
+	) {
+		response.error = "Missing one or more parameters.";
+		return response;
+	}
 	await client.connect();
 	const database = client.db("petfinder");
 	const users = database.collection("users");
@@ -55,6 +64,15 @@ async function verifyUser(username, password) {
 
 async function createUserEntry(username, email, password, confirmPassword) {
 	const response = {};
+	const requiredFields = [username, email, password, confirmPassword];
+	if (
+		requiredFields.includes(undefined) ||
+		requiredFields.includes(null) ||
+		requiredFields.includes("")
+	) {
+		response.error = "Missing one or more parameters.";
+		return response;
+	}
 	if (password !== confirmPassword) {
 		response.error = "Password and confirm password does not match.";
 		return response;
