@@ -41,7 +41,6 @@ export default function Home() {
         let pos = (await Location.getCurrentPositionAsync({})).coords;
         let geocode = `${pos.latitude}, ${pos.longitude}`;
         await AsyncStorage.setItem('latlng', geocode);
-        await AsyncStorage.setItem('last_search_latlng', geocode);
         return geocode;
       }
     
@@ -55,11 +54,12 @@ export default function Home() {
             else {
                 let geocode = await getCurrLocation();
                 if (geocode != "") {
+                    await AsyncStorage.setItem('last_search_latlng', geocode);
                     initialLatLng.current = geocode;
                     setLatLng(geocode);
                 }
                 else {
-                    initialLatLng.current = latLng;
+                    initialLatLng.current = latLng; //rerendering is not necessary as search results are already loaded for this place on mount
                 }
                 
             }
@@ -68,12 +68,12 @@ export default function Home() {
         initializeSearch();
     }, [])
 
-    if (latLng == "") { return <LoadingScreen /> }
+    if (initialLatLng.current == "") { return <LoadingScreen /> }
     return (
         <View style={{flex: 1, backgroundColor: '#f1f3f9'}}>
-            <ScrollView contentContainerStyle={styles.container}>
+            <ScrollView contentContainerStyle={styles.container} nestedScrollEnabled={true} keyboardShouldPersistTaps="handled">
                 <View style={{width: 300, paddingTop: 50}}>
-                    <PlacesSearch initialLatLng={initialLatLng.current} setLatLng={setLatLng} />
+                    <PlacesSearch initialLatLng={initialLatLng.current} setLatLng={setLatLng} getCurrLocation={getCurrLocation} />
                 </View>
             </ScrollView>
         </View>
