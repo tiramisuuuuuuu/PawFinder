@@ -19,7 +19,7 @@ function bypassAuthentication() {
 const login = async (usr: string, pwd: string) => {
 	try {
 		const response = await fetch(
-			"http://localhost:4000/authenticateUser/",
+			"http://192.168.1.166:4000/authenticateUser/",
 			{
 				// Change localhost to your IP
 				method: "post",

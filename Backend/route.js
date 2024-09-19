@@ -5,6 +5,7 @@ const {
 	tester,
 	addUser,
 	authenticateUser,
+	getUser,
 	addBadge,
 	addUserBadge,
 	getUserBadges,
@@ -12,6 +13,10 @@ const {
 	getPetProfiles,
 	addSighting,
 	getSightings,
+	addAvatar,
+	setUserAvatar,
+	getUserAvatar,
+	getAvatars,
 } = require("./controller.js");
 
 const router = express.Router();
@@ -53,6 +58,14 @@ router.post("/addUser", addUser);
  * @returns user token or error
  */
 router.post("/authenticateUser", authenticateUser);
+
+/**
+ * Gets the user corresponding to the user token
+ * @paramtype raw json
+ * @param userToken - user token
+ * @returns user object corresponding to user token
+ */
+router.post("/getUser", getUser);
 
 /**
  * Adds a new badge type to the database
@@ -120,5 +133,36 @@ router.post("/addSighting", upload.array("photos", 10), addSighting);
  * @returns - list of sighting objects
  */
 router.post("/getSightings", getSightings);
+
+/**
+ * Adds one avatar to the database
+ * @paramtype form data
+ * @param avatarImg - image of the avatar
+ * @returns - Success message or error message
+ */
+router.post("/addAvatar", upload.single("avatarImg"), addAvatar);
+
+/**
+ * Set user avatar
+ * @paramtype raw json
+ * @param avatarToken - token of avatar
+ * @param userToken - token of user to add avatar
+ * @returns - Success or error message
+ */
+router.post("/setUserAvatar", setUserAvatar);
+
+/**
+ * Get user avatar image url for the user
+ * @paramtype raw json
+ * @param uesrToken - token of the user
+ * @returns - Image url or error message
+ */
+router.post("/getUserAvatar", getUserAvatar);
+
+/**
+ * Returns the name and image of all the avatars
+ * @returns - list of all avatar objects
+ */
+router.get("/getAvatars", getAvatars);
 
 module.exports = router;

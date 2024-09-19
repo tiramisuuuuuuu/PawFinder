@@ -1,6 +1,7 @@
 const {
 	createUserEntry,
 	verifyUser,
+	getUserInfo,
 } = require("./scripts/authentication");
 
 const {
@@ -9,12 +10,16 @@ const {
 	getUserBadgeObjects,
 } = require("./scripts/badges");
 
-const {
-	createPetProfile,
-	returnPetProfiles,
-} = require("./scripts/petprofile");
+const { createPetProfile, returnPetProfiles } = require("./scripts/petprofile");
 
 const { createSighting, returnSightings } = require("./scripts/sightings");
+
+const {
+	addOneAvatar,
+	editUserAvatar,
+	changeUserAvatar,
+	getAllAvatars,
+} = require("./scripts/avatars");
 
 function tester(req, res) {
 	// Controller logic goes here
@@ -33,6 +38,11 @@ async function addUser(req, res) {
 
 async function authenticateUser(req, res) {
 	result = await verifyUser(req.body.username, req.body.password);
+	res.send(result);
+}
+
+async function getUser(req, res) {
+	result = await getUserInfo(req.body.userToken);
 	res.send(result);
 }
 
@@ -84,8 +94,29 @@ async function getSightings(req, res) {
 	res.send(result);
 }
 
+async function addAvatar(req, res) {
+	result = await addOneAvatar(req.file);
+	res.send(result);
+}
+
+async function setUserAvatar(req, res) {
+	result = await editUserAvatar(req.body.avatarToken, req.body.userToken);
+	res.send(result);
+}
+
+async function getUserAvatar(req, res) {
+	result = await changeUserAvatar(req.body.userToken);
+	res.send(result);
+}
+
+async function getAvatars(req, res) {
+	result = await getAllAvatars();
+	res.send(result);
+}
+
 // Export the controller function
 module.exports = {
+	getUser,
 	tester,
 	addUser,
 	authenticateUser,
@@ -96,4 +127,8 @@ module.exports = {
 	getPetProfiles,
 	addSighting,
 	getSightings,
+	addAvatar,
+	setUserAvatar,
+	getUserAvatar,
+	getAvatars,
 };

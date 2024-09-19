@@ -1,5 +1,5 @@
 const { response } = require("express");
-const { client, storage } = require("./storageServices");
+const { getClient, storage } = require("./storageServices");
 const { ref, uploadBytes, getDownloadURL } = require("firebase/storage");
 const fs = require("fs");
 const { mongoose } = require("mongoose");
@@ -26,6 +26,7 @@ async function createSighting(
 	description,
 	location
 ) {
+	const client = await getClient();
 	const repsonse = {};
 	const requiredFields = [userToken, petToken, photos, description, location];
 	if (requiredFields.includes(undefined) || requiredFields.includes(null)) {
@@ -33,7 +34,6 @@ async function createSighting(
 		return response;
 	}
 
-	await client.connect();
 	const database = client.db("petfinder");
 	const sightings = database.collection("sightings");
 	const date = new Date().toLocaleDateString();
@@ -48,13 +48,12 @@ async function createSighting(
 	};
 	const sightingObj = await sightings.insertOne(sighting);
 	response.token = sightingObj.insertedId;
-	await client.close();
 	return response;
 }
 
 async function returnSightings(userToken) {
+	const client = await getClient();
 	const response = {};
-	await client.connect();
 	const database = client.db("petfinder");
 	const users = database.collection("users");
 	const sightings = database.collection("sightings");
@@ -70,7 +69,6 @@ async function returnSightings(userToken) {
 	const sightingObjects = await sightings
 		.find({ userToken: userToken })
 		.toArray();
-	await client.close();
 	return sightingObjects;
 }
 
