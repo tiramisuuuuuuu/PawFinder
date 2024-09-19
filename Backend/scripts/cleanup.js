@@ -13,7 +13,7 @@ function deleteStaleImages() {
 
 				const fileAge = currentTime - stats.birthtimeMs;
 
-				if (fileAge > 5 * 60 * 1000) {
+				if (fileAge > 60 * 1000) {
 					fs.unlink(filePath, (error) => {});
 				}
 			});
