@@ -119,6 +119,7 @@ async function getUserAvatar(req, res) {
 
 async function getAvatars(req, res) {
 	result = await getAllAvatars();
+}
   
 async function getLocation(req, res) {
 	result = await returnLocation(req.body.latitude, req.body.longitude);
