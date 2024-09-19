@@ -135,7 +135,7 @@ export default function SignIn() {
 					Let's get started!
 				</Text>
 
-				<InputField
+        <InputField
 					header="Username"
 					iconName="person"
 					redBox={emptyParams.includes("username")}

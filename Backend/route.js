@@ -17,6 +17,8 @@ const {
 	setUserAvatar,
 	getUserAvatar,
 	getAvatars,
+	getAutocomplete,
+	getLocation,
 } = require("./controller.js");
 
 const router = express.Router();
@@ -164,5 +166,13 @@ router.post("/getUserAvatar", getUserAvatar);
  * @returns - list of all avatar objects
  */
 router.get("/getAvatars", getAvatars);
+
+/** Gets nearest location of given lat and lang
+ * @paramtype raw json
+ * @param latitude - latitude as a type number
+ * @param longitude - longitude as a type number
+ * @returns - a place
+ */
+router.post("/getLocation", getLocation);
 
 module.exports = router;
