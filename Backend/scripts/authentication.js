@@ -1,5 +1,7 @@
-const { client } = require("./storageServices");
+const { getClient } = require("./storageServices");
 const bcrypt = require("bcrypt");
+const { mongoose } = require("mongoose");
+const { getAllAvatars } = require("./avatars");
 
 // HELPER FUNCTIONS
 async function getUser(users, username) {
@@ -32,10 +34,24 @@ async function verifyPassword(inputPassword, hashedPassword) {
 	});
 }
 
+async function defaultAvatar() {
+	avatars = await getAllAvatars();
+	return avatars[0]._id;
+}
+
 // MAIN FUNCTIONS
 async function verifyUser(username, password) {
+	const client = await getClient();
 	const response = {};
-	await client.connect();
+	const requiredFields = [username, password];
+	if (
+		requiredFields.includes(undefined) ||
+		requiredFields.includes(null) ||
+		requiredFields.includes("")
+	) {
+		response.error = "Missing one or more parameters.";
+		return response;
+	}
 	const database = client.db("petfinder");
 	const users = database.collection("users");
 	const user = await getUser(users, username);
@@ -54,12 +70,21 @@ async function verifyUser(username, password) {
 }
 
 async function createUserEntry(username, email, password, confirmPassword) {
+	const client = await getClient();
 	const response = {};
+	const requiredFields = [username, email, password, confirmPassword];
+	if (
+		requiredFields.includes(undefined) ||
+		requiredFields.includes(null) ||
+		requiredFields.includes("")
+	) {
+		response.error = "Missing one or more parameters.";
+		return response;
+	}
 	if (password !== confirmPassword) {
 		response.error = "Password and confirm password does not match.";
 		return response;
 	}
-	await client.connect();
 	const database = client.db("petfinder");
 	const users = database.collection("users");
 	const userObj = await getUser(users, username);
@@ -68,19 +93,36 @@ async function createUserEntry(username, email, password, confirmPassword) {
 		return response;
 	}
 	const hashedPassword = await encryptPassword(password);
+	const avatar = await defaultAvatar();
 	const user = {
 		username: username,
 		email: email,
 		password: hashedPassword,
 		badges: [],
+		avatar: avatar.toString(),
 	};
 	const inserted = await users.insertOne(user);
 	response.token = inserted.insertedId;
-	await client.close();
 	return response;
+}
+
+async function getUserInfo(userToken) {
+	const client = await getClient();
+	const response = {};
+	const database = client.db("petfinder");
+	const users = database.collection("users");
+	const user = await users.findOne({
+		_id: new mongoose.Types.ObjectId(userToken),
+	});
+	if (!user) {
+		response.error = "No user with the username found.";
+		return response;
+	}
+	return user;
 }
 
 module.exports = {
 	createUserEntry,
 	verifyUser,
+	getUserInfo,
 };

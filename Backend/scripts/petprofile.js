@@ -1,4 +1,4 @@
-const { client } = require("./storageServices");
+const { getClient } = require("./storageServices");
 const { mongoose } = require("mongoose");
 
 async function createPetProfile(
@@ -9,6 +9,7 @@ async function createPetProfile(
 	petDescription,
 	assignedTasks
 ) {
+	const client = await getClient();
 	const response = {};
 	const requiredFields = [
 		userToken,
@@ -22,7 +23,6 @@ async function createPetProfile(
 		response.error = "Missing one or more parameters.";
 		return repsonse;
 	}
-	await client.connect();
 	const database = client.db("petfinder");
 	const petprofiles = database.collection("petprofiles");
 	const date = new Date().toLocaleDateString();
@@ -36,14 +36,13 @@ async function createPetProfile(
 		assignedTasks: assignedTasks,
 	};
 	const petObj = await petprofiles.insertOne(pet);
-	await client.close();
 	response.token = petObj.insertedId;
 	return response;
 }
 
 async function returnPetProfiles(userToken) {
+	const client = await getClient();
 	const response = {};
-	await client.connect();
 	const database = client.db("petfinder");
 	const users = database.collection("users");
 	const petprofiles = database.collection("petprofiles");
@@ -59,7 +58,6 @@ async function returnPetProfiles(userToken) {
 	const petProfileObjects = await petprofiles
 		.find({ userToken: userToken })
 		.toArray();
-	await client.close();
 	return petProfileObjects;
 }
 
