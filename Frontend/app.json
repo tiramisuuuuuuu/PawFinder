@@ -35,8 +35,8 @@
       "typedRoutes": true
     },
     "extra": {
-      "googleMapsApiKey": "INSERT_GOOGLE_MAPS_API_KEY",
-      "backendURL": "INSERT_BACKEND_IP_ADDRESS:4000"
+      "googleMapsApiKey": "AIzaSyBheB5lWhhFfEcmLy13F7hChSoz2VqEAHE",
+      "backendURL": "192.168.1.166:4000"
     }
   }
 }

@@ -2,6 +2,7 @@ import { ScrollView, View, Text, TouchableOpacity } from "react-native";
 import { Image } from "expo-image";
 import { useEffect, useState } from "react";
 import { router } from "expo-router";
+import Constants from 'expo-constants';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import styles from "./styles";
 
@@ -19,6 +20,10 @@ type User = {
 	avatar?: string;
 };
 
+type URL = {
+	url?: string;
+};
+
 async function getToken(): Promise<string> {
 	try {
 		const value = await AsyncStorage.getItem("token");
@@ -34,7 +39,7 @@ async function getToken(): Promise<string> {
 
 async function getAvatars(): Promise<Avatar[]> {
 	try {
-		const response = await fetch("http://192.168.1.166:4000/getAvatars/", {
+		const response = await fetch(`http://${Constants.expoConfig?.extra?.backendURL}/getAvatars/`, {
 			// Change localhost to your IP
 			method: "get",
 			headers: {
@@ -53,7 +58,7 @@ async function getAvatars(): Promise<Avatar[]> {
 async function getAvatarURL(token: string): Promise<string> {
 	try {
 		const response = await fetch(
-			"http://192.168.1.166:4000/getUserAvatar/",
+			`http://${Constants.expoConfig?.extra?.backendURL}/getUserAvatar/`,
 			{
 				// Change localhost to your IP
 				method: "post",
@@ -66,8 +71,11 @@ async function getAvatarURL(token: string): Promise<string> {
 				}),
 			}
 		);
-		const result: string = await response.json();
-		return result;
+		const result: URL = await response.json();
+		if (!result.url) {
+			return "";
+		}
+		return result.url;
 	} catch (err) {
 		console.error("Network issue:", err);
 		return "";
@@ -112,7 +120,7 @@ export default function Profiles() {
 
 	const [avatars, setAvatars] = useState<Avatar[]>([]);
 	const [user, setUser] = useState<User>({});
-	const [avatarUrl, setAvatarUrl] = useState("");
+	const [avatarUrl, setAvatarUrl] = useState<string>("");
 
 	useEffect(() => {
 		const fetchAvatars = async () => {
@@ -125,7 +133,7 @@ export default function Profiles() {
 				setUser(await getUserInfo(token));
 				const url = await getAvatarURL(token);
 				console.log(url);
-				setAvatarUrl(await getAvatarURL(token));
+				setAvatarUrl(url);
 			}
 		};
 		fetchAvatars();
