@@ -1,9 +1,22 @@
 // MongoDB
 const { MongoClient } = require("mongodb");
 
-const url =
-	"mongodb+srv://admin:admin@petfinder.h236iki.mongodb.net/?retryWrites=true&w=majority&appName=PetFinder";
-const client = new MongoClient(url);
+let client;
+async function databaseConnection() {
+	if (!client) {
+		const url =
+			"mongodb+srv://admin:admin@petfinder.h236iki.mongodb.net/?retryWrites=true&w=majority&appName=PetFinder";
+		client = new MongoClient(url);
+		await client.connect();
+		return client;
+	} else {
+		return client;
+	}
+}
+
+async function getClient() {
+	return await databaseConnection();
+}
 
 // Firebase Storage
 const { initializeApp } = require("firebase/app");
@@ -21,9 +34,9 @@ const firebaseConfig = {
 };
 
 const firebaseApp = initializeApp(firebaseConfig);
-const storage = getStorage(firebaseApp);
+const storage = getStorage(firebaseApp, "gs://pawfinder-1f103.appspot.com");
 
 module.exports = {
-	client,
+	getClient,
 	storage,
 };

@@ -5,6 +5,7 @@ const {
 	tester,
 	addUser,
 	authenticateUser,
+	getUser,
 	addBadge,
 	addUserBadge,
 	getUserBadges,
@@ -12,6 +13,10 @@ const {
 	getPetProfiles,
 	addSighting,
 	getSightings,
+	addAvatar,
+	setUserAvatar,
+	getUserAvatar,
+	getAvatars,
 	getAutocomplete,
 	getLocation,
 } = require("./controller.js");
@@ -40,7 +45,9 @@ router.get("/", tester);
  * Adds username to database
  * @paramtype raw json
  * @param username - username of user
+ * @param email - email of user
  * @param password - password of user
+ * @param confirmPassword - second password input from user
  * @returns user token or error
  */
 router.post("/addUser", addUser);
@@ -49,12 +56,18 @@ router.post("/addUser", addUser);
  * Checks if username/password combo is in database
  * @paramtype raw json
  * @param username - username of user
- * @param email - email of user
  * @param password - password of user
- * @param confirmPassword - second password input from user
  * @returns user token or error
  */
 router.post("/authenticateUser", authenticateUser);
+
+/**
+ * Gets the user corresponding to the user token
+ * @paramtype raw json
+ * @param userToken - user token
+ * @returns user object corresponding to user token
+ */
+router.post("/getUser", getUser);
 
 /**
  * Adds a new badge type to the database
@@ -124,7 +137,37 @@ router.post("/addSighting", upload.array("photos", 10), addSighting);
 router.post("/getSightings", getSightings);
 
 /**
- * Gets nearest location of given lat and lang
+ * Adds one avatar to the database
+ * @paramtype form data
+ * @param avatarImg - image of the avatar
+ * @returns - Success message or error message
+ */
+router.post("/addAvatar", upload.single("avatarImg"), addAvatar);
+
+/**
+ * Set user avatar
+ * @paramtype raw json
+ * @param avatarToken - token of avatar
+ * @param userToken - token of user to add avatar
+ * @returns - Success or error message
+ */
+router.post("/setUserAvatar", setUserAvatar);
+
+/**
+ * Get user avatar image url for the user
+ * @paramtype raw json
+ * @param uesrToken - token of the user
+ * @returns - Image url or error message
+ */
+router.post("/getUserAvatar", getUserAvatar);
+
+/**
+ * Returns the name and image of all the avatars
+ * @returns - list of all avatar objects
+ */
+router.get("/getAvatars", getAvatars);
+
+/** Gets nearest location of given lat and lang
  * @paramtype raw json
  * @param latitude - latitude as a type number
  * @param longitude - longitude as a type number
