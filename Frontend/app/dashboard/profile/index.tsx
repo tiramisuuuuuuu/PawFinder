@@ -1,56 +1,153 @@
-
-import {
-	ScrollView,
-	View,
-	StyleSheet,
-	Text,
-	Image,
-	TouchableOpacity,
-} from "react-native";
-
+import { ScrollView, View, Text, TouchableOpacity } from "react-native";
+import { Image } from "expo-image";
+import { useEffect, useState } from "react";
 import { router } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import styles from "./styles";
+
+type Avatar = {
+	_id: string;
+	avatarImageURL: string;
+};
+
+type User = {
+	_id?: string;
+	username?: string;
+	email?: string;
+	password?: string;
+	badges?: string[];
+	avatar?: string;
+};
+
+async function getToken(): Promise<string> {
+	try {
+		const value = await AsyncStorage.getItem("token");
+		if (value === null) {
+			return "";
+		}
+		return value;
+	} catch (error) {
+		console.error("Error getting token:", error);
+		return "";
+	}
+}
+
+async function getAvatars(): Promise<Avatar[]> {
+	try {
+		const response = await fetch("http://192.168.1.166:4000/getAvatars/", {
+			// Change localhost to your IP
+			method: "get",
+			headers: {
+				Accept: "application/json",
+				"Content-Type": "application/json",
+			},
+		});
+		const result: Avatar[] = await response.json();
+		return result;
+	} catch (err) {
+		console.error("Network issue:", err);
+		return [];
+	}
+}
+
+async function getAvatarURL(token: string): Promise<string> {
+	try {
+		const response = await fetch(
+			"http://192.168.1.166:4000/getUserAvatar/",
+			{
+				// Change localhost to your IP
+				method: "post",
+				headers: {
+					Accept: "application/json",
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					userToken: token,
+				}),
+			}
+		);
+		const result: string = await response.json();
+		return result;
+	} catch (err) {
+		console.error("Network issue:", err);
+		return "";
+	}
+}
+
+async function getUserInfo(token: string): Promise<any> {
+	try {
+		const response = await fetch("http://192.168.1.166:4000/getUser/", {
+			// Change localhost to your IP
+			method: "post",
+			headers: {
+				Accept: "application/json",
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({
+				userToken: token,
+			}),
+		});
+		const result: User = await response.json();
+		return result;
+	} catch (err) {
+		console.error("Network issue:", err);
+		return [];
+	}
+}
+
+const handleAvatarPress = () => {
+	console.log("Yess");
+};
+
+const handleButtonPress = () => {
+	router.push("./profile/account");
+};
 
 export default function Profiles() {
-	const avatarSource = require("./avatars/dog.png");
+	// const avatarSource = require("./avatars/dog.png");
 	const accountSource = require("./account.png");
 	const arrowSource = require("./right-arrow.png");
 	const avatarIconSource = require("./avatar.png");
 	const medalSource = require("./medal.png");
-	const avatars = [
-		require("./avatars/bunny.png"),
-		require("./avatars/cat.png"),
-		require("./avatars/dog.png"),
-		require("./avatars/octopus.png"),
-		require("./avatars/panda.png"),
-		require("./avatars/tiger.png"),
-		require("./avatars/turtle.png"),
-		require("./avatars/whale.png"),
-	];
-	const handleButtonPress = () => {
-		console.log("Success");
-		router.push("./profile/account");
-	};
+
+	const [avatars, setAvatars] = useState<Avatar[]>([]);
+	const [user, setUser] = useState<User>({});
+	const [avatarUrl, setAvatarUrl] = useState("");
+
+	useEffect(() => {
+		const fetchAvatars = async () => {
+			const avatarObjs = await getAvatars();
+			setAvatars(avatarObjs);
+		};
+		const loadUserInfo = async () => {
+			const token = await getToken();
+			if (token) {
+				setUser(await getUserInfo(token));
+				const url = await getAvatarURL(token);
+				console.log(url);
+				setAvatarUrl(await getAvatarURL(token));
+			}
+		};
+		fetchAvatars();
+		loadUserInfo();
+	}, []);
+
 	return (
 		<ScrollView contentContainerStyle={styles.container}>
 			<View style={styles.title}>
 				<Text style={styles.profile}>Profile</Text>
-				<Text style={styles.username}>username</Text>
-				<Image
-					style={styles.avatarImages}
-					source={avatarSource}
-				></Image>
+				<Text style={styles.username}>{user.username}</Text>
+				<Image style={styles.avatarImages} source={avatarUrl} />
 			</View>
 			<View style={styles.account}>
 				<TouchableOpacity
 					style={styles.button}
 					onPress={handleButtonPress}
+					activeOpacity={1}
 				>
-					<Image
-						style={styles.sectionImage}
-						source={accountSource}
-					></Image>
+					<Image style={styles.sectionImage} source={accountSource} />
 					<Text style={styles.sectionTitle}>Account Info</Text>
-					<Image source={arrowSource} style={styles.arrow}></Image>
+					<Image source={arrowSource} style={styles.arrow} />
 				</TouchableOpacity>
 			</View>
 			<View style={styles.avatar}>
@@ -58,149 +155,31 @@ export default function Profiles() {
 					<Image
 						style={styles.sectionImage}
 						source={avatarIconSource}
-					></Image>
+					/>
 					<Text style={styles.sectionTitle}>Avatar</Text>
 				</View>
 				<View style={styles.avatarChoices}>
 					{avatars.map((avatar) => (
-						<Image
-							source={avatar}
-							style={styles.avatarSelectionImg}
-						></Image>
+						<TouchableOpacity
+							key={avatar._id.toString()}
+							onPress={handleAvatarPress}
+							activeOpacity={1}
+						>
+							<Image
+								key={avatar._id.toString()}
+								source={{ uri: avatar.avatarImageURL }}
+								style={styles.avatarSelectionImg}
+							/>
+						</TouchableOpacity>
 					))}
 				</View>
 			</View>
 			<View style={styles.achievements}>
 				<View style={styles.avatarTitle}>
-					<Image
-						style={styles.sectionImage}
-						source={medalSource}
-					></Image>
+					<Image style={styles.sectionImage} source={medalSource} />
 					<Text style={styles.sectionTitle}>Points And Badges</Text>
 				</View>
 			</View>
 		</ScrollView>
 	);
 }
-
-const styles = StyleSheet.create({
-	// Common
-	container: {
-		flex: 1,
-		backgroundColor: "#ffd4f8",
-		minHeight: "100%",
-	},
-	avatarImages: {
-		height: 50,
-		width: 50,
-		resizeMode: "contain",
-		alignSelf: "center",
-		borderRadius: 50 / 2,
-		borderWidth: 3,
-		borderColor: "#fa7ae0",
-		padding: 5,
-		marginRight: 20,
-		backgroundColor: "black",
-	},
-	sectionTitle: {
-		flex: 0.9,
-		fontFamily: "Poppins-Regular",
-		fontWeight: "bold",
-		alignSelf: "center",
-	},
-	sectionImage: {
-		height: 45,
-		width: 45,
-		marginRight: 5,
-		resizeMode: "contain",
-	},
-	// Title
-	title: {
-		flex: 0.3,
-		flexDirection: "row",
-		justifyContent: "center",
-		alignItems: "center",
-	},
-	profile: {
-		flex: 1,
-		color: "black",
-		fontFamily: "Poppins-Regular",
-		fontSize: 21,
-		textAlign: "left",
-		marginLeft: "8%",
-		fontWeight: "bold",
-		textDecorationLine: "underline",
-	},
-	username: {
-		flex: 1,
-		color: "black",
-		fontSize: 15,
-		textAlign: "right",
-		paddingRight: 10,
-		fontFamily: "Poppins-Regular",
-	},
-	// Account
-	account: {
-		flex: 0.2,
-		flexDirection: "row",
-		padding: 10,
-		borderColor: "#fa7ae0",
-		borderWidth: 3,
-		borderRadius: 20,
-		margin: 10,
-	},
-	button: {
-		flex: 1,
-		flexDirection: "row",
-	},
-	arrow: {
-		flex: 0.1,
-		height: 35,
-		width: 35,
-		alignSelf: "center",
-		resizeMode: "contain",
-	},
-	// Avatar
-	avatar: {
-		flex: 1,
-		flexDirection: "column",
-		padding: 10,
-		borderColor: "#fa7ae0",
-		borderWidth: 3,
-		borderRadius: 20,
-		marginHorizontal: 10,
-		marginVertical: 10,
-	},
-	avatarTitle: {
-		flexDirection: "row",
-	},
-	avatarChoices: {
-		flexDirection: "row",
-		flexWrap: "wrap",
-		justifyContent: "center",
-		columnGap: 15,
-		rowGap: 5,
-	},
-	avatarSelectionImg: {
-		height: 60,
-		width: 60,
-		resizeMode: "contain",
-		alignSelf: "center",
-		borderRadius: 60 / 2,
-		borderWidth: 3,
-		borderColor: "#fa7ae0",
-		padding: 5,
-		backgroundColor: "black",
-	},
-	// Achievements
-	achievements: {
-		flex: 1,
-		flexDirection: "column",
-		padding: 10,
-		borderColor: "#fa7ae0",
-		borderWidth: 3,
-		borderRadius: 20,
-		marginHorizontal: 10,
-		marginVertical: 10,
-	},
-});
