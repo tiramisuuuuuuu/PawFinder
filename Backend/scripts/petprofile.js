@@ -1,15 +1,17 @@
-const { client } = require("../storageServices");
+const { client } = require("./storageServices");
+const { mongoose } = require("mongoose");
 
 async function createPetProfile(
-	username,
+	userToken,
 	petName,
 	petSpecies,
 	lastSeen,
 	petDescription,
 	assignedTasks
 ) {
+	const response = {};
 	const requiredFields = [
-		username,
+		userToken,
 		petName,
 		petSpecies,
 		lastSeen,
@@ -17,14 +19,15 @@ async function createPetProfile(
 		assignedTasks,
 	];
 	if (requiredFields.includes(undefined) || requiredFields.includes(null)) {
-		return "Missing one or more parameters.";
+		response.error = "Missing one or more parameters.";
+		return repsonse;
 	}
 	await client.connect();
 	const database = client.db("petfinder");
 	const petprofiles = database.collection("petprofiles");
 	const date = new Date().toLocaleDateString();
 	const pet = {
-		username: username,
+		userToken: userToken,
 		petName: petName,
 		petSpecies: petSpecies,
 		posted: date,
@@ -32,24 +35,29 @@ async function createPetProfile(
 		petDescription: petDescription,
 		assignedTasks: assignedTasks,
 	};
-	await petprofiles.insertOne(pet);
+	const petObj = await petprofiles.insertOne(pet);
 	await client.close();
-	return `Pet ${petName} has been added to the database.`;
+	response.token = petObj.insertedId;
+	return response;
 }
 
-async function returnPetProfiles(username) {
+async function returnPetProfiles(userToken) {
+	const response = {};
 	await client.connect();
 	const database = client.db("petfinder");
 	const users = database.collection("users");
 	const petprofiles = database.collection("petprofiles");
 
-	const user = await users.findOne({ username: username });
+	const user = await users.findOne({
+		_id: new mongoose.Types.ObjectId(userToken),
+	});
 	if (!user) {
-		return "No user with the username found.";
+		response.error = "No user with the username found.";
+		return response;
 	}
 
 	const petProfileObjects = await petprofiles
-		.find({ username: username })
+		.find({ userToken: userToken })
 		.toArray();
 	await client.close();
 	return petProfileObjects;
