@@ -1,38 +1,35 @@
 {
   "expo": {
-    "name": "pawfinder",
-    "slug": "pawfinder",
-    "version": "1.0.0",
-    "orientation": "portrait",
-    "icon": "./assets/images/splash.png",
-    "scheme": "myapp",
-    "userInterfaceStyle": "automatic",
-    "splash": {
-      "image": "./assets/images/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
-    "ios": {
-      "supportsTablet": true
-    },
-    "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/images/splash.png",
-        "backgroundColor": "#ffffff"
-      },
-      "package": "com.anonymous.pawfinder"
-    },
-    "web": {
-      "bundler": "metro",
-      "output": "static",
-      "favicon": "./assets/images/splash.png"
-    },
-    "plugins": [
-      "expo-router",
-      "expo-font"
-    ],
-    "experiments": {
-      "typedRoutes": true
-    }
+		"name": "pawfinder",
+		"slug": "pawfinder",
+		"version": "1.0.0",
+		"orientation": "portrait",
+		"icon": "./assets/images/splash.png",
+		"scheme": "myapp",
+		"userInterfaceStyle": "automatic",
+		"splash": {
+			"image": "./assets/images/splash.png",
+			"resizeMode": "contain",
+			"backgroundColor": "#ffffff"
+		},
+		"ios": {
+			"supportsTablet": true
+		},
+		"android": {
+			"adaptiveIcon": {
+				"foregroundImage": "./assets/images/splash.png",
+				"backgroundColor": "#ffffff"
+			},
+			"package": "com.anonymous.pawfinder"
+		},
+		"web": {
+			"bundler": "metro",
+			"output": "static",
+			"favicon": "./assets/images/splash.png"
+		},
+		"plugins": ["expo-router", "expo-font"],
+		"experiments": {
+			"typedRoutes": true
+		}
   }
 }

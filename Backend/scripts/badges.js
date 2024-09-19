@@ -1,12 +1,12 @@
-const { client, storage } = require("./storageServices");
+const { getClient, storage } = require("./storageServices");
 const { ref, uploadBytes, getDownloadURL } = require("firebase/storage");
 const fs = require("fs");
 const { mongoose } = require("mongoose");
 
 // HELPER FUNCTIONS
 async function addBadgeToDatabase(badgeName, badgeImageURL) {
+	const client = await getClient();
 	const badge = { badgeName: badgeName, badgeImageURL: badgeImageURL };
-	await client.connect();
 	const database = client.db("petfinder");
 	const badges = database.collection("badges");
 	const badgeObj = await badges.insertOne(badge);
@@ -15,6 +15,7 @@ async function addBadgeToDatabase(badgeName, badgeImageURL) {
 
 // MAIN FUNCTIONS
 async function createNewBadge(badgeName, badgePicture) {
+	const client = await getClient();
 	const response = {};
 	if (!(badgeName && badgePicture)) {
 		response.error = "Missing one or more parameters.";
@@ -31,8 +32,8 @@ async function createNewBadge(badgeName, badgePicture) {
 }
 
 async function addBadgeToUser(userToken, badgeToken) {
+	const client = await getClient();
 	const response = {};
-	await client.connect();
 	const database = client.db("petfinder");
 	const users = database.collection("users");
 	const badges = database.collection("badges");
@@ -58,8 +59,8 @@ async function addBadgeToUser(userToken, badgeToken) {
 }
 
 async function getUserBadgeObjects(userToken) {
+	const client = await getClient();
 	response = {};
-	await client.connect();
 	const database = client.db("petfinder");
 	const users = database.collection("users");
 	const badges = database.collection("badges");
