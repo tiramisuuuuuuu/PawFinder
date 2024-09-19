@@ -15,7 +15,7 @@ const { createPetProfile, returnPetProfiles } = require("./scripts/petprofile");
 const { 
 	createSighting,
 	returnSightings 
-} = require("./sightings/sightings");
+} = require("./scripts/sightings");
 
 const {
 	returnLocation,
