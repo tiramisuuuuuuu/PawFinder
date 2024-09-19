@@ -17,7 +17,7 @@ const {
 const { 
 	createSighting,
 	returnSightings 
-} = require("./sightings/sightings");
+} = require("./scripts/sightings");
 
 const {
 	returnLocation,
