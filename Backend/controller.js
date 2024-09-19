@@ -12,7 +12,15 @@ const {
 
 const { createPetProfile, returnPetProfiles } = require("./scripts/petprofile");
 
-const { createSighting, returnSightings } = require("./scripts/sightings");
+const { 
+	createSighting,
+	returnSightings 
+} = require("./sightings/sightings");
+
+const {
+	returnLocation,
+} = require("./google/maps");
+
 
 const {
 	addOneAvatar,
@@ -111,6 +119,9 @@ async function getUserAvatar(req, res) {
 
 async function getAvatars(req, res) {
 	result = await getAllAvatars();
+  
+async function getLocation(req, res) {
+	result = await returnLocation(req.body.latitude, req.body.longitude);
 	res.send(result);
 }
 
@@ -131,4 +142,5 @@ module.exports = {
 	setUserAvatar,
 	getUserAvatar,
 	getAvatars,
+	getLocation,
 };
