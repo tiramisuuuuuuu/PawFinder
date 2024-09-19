@@ -4,6 +4,7 @@ const path = require("path");
 function deleteStaleImages() {
 	const imageLocation = path.join(__dirname, "../public/images");
 	fs.readdir(imageLocation, (err, files) => {
+		if (!files) { return }
 		files.forEach((file) => {
 			const filePath = path.join(imageLocation, file);
 
