@@ -84,7 +84,7 @@ async function getAvatarURL(token: string): Promise<string> {
 
 async function getUserInfo(token: string): Promise<any> {
 	try {
-		const response = await fetch("http://192.168.1.166:4000/getUser/", {
+		const response = await fetch(`http://${Constants.expoConfig?.extra?.backendURL}/getUser/`, {
 			// Change localhost to your IP
 			method: "post",
 			headers: {
