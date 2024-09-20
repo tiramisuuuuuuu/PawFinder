@@ -10,17 +10,16 @@ const {
 	getUserBadgeObjects,
 } = require("./scripts/badges");
 
-const { createPetProfile, returnPetProfiles } = require("./scripts/petprofile");
-
-const { 
-	createSighting,
-	returnSightings 
-} = require("./scripts/sightings");
-
 const {
-	returnLocation,
-} = require("./google/maps");
+	createPetProfile,
+	returnPetProfiles,
+	nearbyPetProfiles,
+	retrievePetProfile,
+} = require("./scripts/petprofile");
 
+const { createSighting, returnSightings } = require("./scripts/sightings");
+
+const { returnLocation } = require("./google/maps");
 
 const {
 	addOneAvatar,
@@ -72,17 +71,30 @@ async function getUserBadges(req, res) {
 async function addPetProfile(req, res) {
 	result = await createPetProfile(
 		req.body.userToken,
+		req.body.username,
+		req.body.contact,
 		req.body.petName,
-		req.body.petSpecies,
+		req.body.petBreed,
 		req.body.lastSeen,
 		req.body.petDescription,
-		req.body.assignedTasks
+		req.body.assignedTasks,
+		req.file
 	);
 	res.send(result);
 }
 
 async function getPetProfiles(req, res) {
 	result = await returnPetProfiles(req.body.userToken);
+	res.send(result);
+}
+
+async function getNearbyPetProfiles(req, res) {
+	result = await nearbyPetProfiles(req.body.latitude, req.body.longitude);
+	res.send(result);
+}
+
+async function getPetProfileByID(req, res) {
+	result = await retrievePetProfile(req.body.petToken);
 	res.send(result);
 }
 
@@ -120,7 +132,7 @@ async function getUserAvatar(req, res) {
 async function getAvatars(req, res) {
 	result = await getAllAvatars();
 }
-  
+
 async function getLocation(req, res) {
 	result = await returnLocation(req.body.latitude, req.body.longitude);
 	res.send(result);
@@ -137,6 +149,8 @@ module.exports = {
 	getUserBadges,
 	addPetProfile,
 	getPetProfiles,
+	getNearbyPetProfiles,
+	getPetProfileByID,
 	addSighting,
 	getSightings,
 	addAvatar,

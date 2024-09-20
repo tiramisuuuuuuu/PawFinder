@@ -1,4 +1,3 @@
-const { response } = require("express");
 const { getClient, storage } = require("./storageServices");
 const { ref, uploadBytes, getDownloadURL } = require("firebase/storage");
 const fs = require("fs");
