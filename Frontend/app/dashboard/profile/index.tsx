@@ -2,7 +2,7 @@ import { ScrollView, View, Text, TouchableOpacity } from "react-native";
 import { Image } from "expo-image";
 import { useEffect, useState } from "react";
 import { router } from "expo-router";
-import Constants from 'expo-constants';
+import Constants from "expo-constants";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import styles from "./styles";
 
@@ -39,14 +39,17 @@ async function getToken(): Promise<string> {
 
 async function getAvatars(): Promise<Avatar[]> {
 	try {
-		const response = await fetch(`http://${Constants.expoConfig?.extra?.backendURL}/getAvatars/`, {
-			// Change localhost to your IP
-			method: "get",
-			headers: {
-				Accept: "application/json",
-				"Content-Type": "application/json",
-			},
-		});
+		const response = await fetch(
+			`http://${Constants.expoConfig?.extra?.backendURL}/getAvatars/`,
+			{
+				// Change localhost to your IP
+				method: "get",
+				headers: {
+					Accept: "application/json",
+					"Content-Type": "application/json",
+				},
+			}
+		);
 		const result: Avatar[] = await response.json();
 		return result;
 	} catch (err) {
@@ -84,17 +87,20 @@ async function getAvatarURL(token: string): Promise<string> {
 
 async function getUserInfo(token: string): Promise<any> {
 	try {
-		const response = await fetch(`http://${Constants.expoConfig?.extra?.backendURL}/getUser/`, {
-			// Change localhost to your IP
-			method: "post",
-			headers: {
-				Accept: "application/json",
-				"Content-Type": "application/json",
-			},
-			body: JSON.stringify({
-				userToken: token,
-			}),
-		});
+		const response = await fetch(
+			`http://${Constants.expoConfig?.extra?.backendURL}/getUser/`,
+			{
+				// Change localhost to your IP
+				method: "post",
+				headers: {
+					Accept: "application/json",
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					userToken: token,
+				}),
+			}
+		);
 		const result: User = await response.json();
 		return result;
 	} catch (err) {
@@ -103,9 +109,27 @@ async function getUserInfo(token: string): Promise<any> {
 	}
 }
 
-const handleAvatarPress = () => {
-	console.log("Yess");
-};
+async function changeUserAvatar(userToken: string, avatarToken: string) {
+	try {
+		const response = await fetch(
+			`http://${Constants.expoConfig?.extra?.backendURL}/setUserAvatar/`,
+			{
+				// Change localhost to your IP
+				method: "post",
+				headers: {
+					Accept: "application/json",
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					userToken: userToken,
+					avatarToken: avatarToken,
+				}),
+			}
+		);
+	} catch (err) {
+		console.error("Network issue:", err);
+	}
+}
 
 const handleButtonPress = () => {
 	router.push("./profile/account");
@@ -121,6 +145,13 @@ export default function Profiles() {
 	const [avatars, setAvatars] = useState<Avatar[]>([]);
 	const [user, setUser] = useState<User>({});
 	const [avatarUrl, setAvatarUrl] = useState<string>("");
+
+	const handleAvatarPress = async (avatarToken: string) => {
+		const token = await getToken();
+		await changeUserAvatar(token, avatarToken);
+		const newUrl = await getAvatarURL(token);
+		setAvatarUrl(newUrl);
+	};
 
 	useEffect(() => {
 		const fetchAvatars = async () => {
@@ -170,7 +201,9 @@ export default function Profiles() {
 					{avatars.map((avatar) => (
 						<TouchableOpacity
 							key={avatar._id.toString()}
-							onPress={handleAvatarPress}
+							onPress={() => {
+								handleAvatarPress(avatar._id.toString());
+							}}
 							activeOpacity={1}
 						>
 							<Image
