@@ -73,7 +73,6 @@ async function getUserBadgeObjects(userToken) {
 		return response;
 	}
 
-	badgeObjects = [];
 	const badgeObjects = await Promise.all(
 		user.badges.map(async (badgeToken) => {
 			return await badges.findOne({
