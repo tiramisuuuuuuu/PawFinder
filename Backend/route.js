@@ -11,13 +11,14 @@ const {
 	getUserBadges,
 	addPetProfile,
 	getPetProfiles,
+	getNearbyPetProfiles,
+	getPetProfileByID,
 	addSighting,
 	getSightings,
 	addAvatar,
 	setUserAvatar,
 	getUserAvatar,
 	getAvatars,
-	getAutocomplete,
 	getLocation,
 } = require("./controller.js");
 
@@ -97,16 +98,19 @@ router.post("/getUserBadges", getUserBadges);
 
 /**
  * Add missing pet profile
- * @paramtype raw json
- * @param userToken - token of user that's adding the profile
+ * @paramtype form data
+ * @param userToken - token of pet owner
+ * @param username - username of pet owner
+ * @param contact - contact info of pet owner
  * @param petName - name of pet
- * @param petSpecies - species of pet
+ * @param petBreed - pet breed
  * @param lastSeen - location the pet was last seen
  * @param petDescription - description of the pet
  * @param assignedTasks - tasks assigned
+ * @param petImage - image of the lost petpet
  * @returns pet profile token
  */
-router.post("/addPetProfile", addPetProfile);
+router.post("/addPetProfile", upload.single("petImage"), addPetProfile);
 
 /**
  * Gets all the pet profiles attached to the user
@@ -115,6 +119,23 @@ router.post("/addPetProfile", addPetProfile);
  * @returns List of pet profile objects or error
  */
 router.post("/getPetProfiles", getPetProfiles);
+
+/**
+ * Get nearby pet profiles
+ * @paramtype raw json
+ * @param latitude - latitude of user location
+ * @param longitude - longitude of user location
+ * @returns List of pet profile objects without user token
+ */
+router.post("/getNearbyPetProfiles", getNearbyPetProfiles);
+
+/**
+ * Get pet profiles by ID
+ * @paramtype raw json
+ * @param petToken - token of pet profile
+ * @returns Pet Profile Objects
+ */
+router.post("/getPetProfileByID", getPetProfileByID);
 
 /**
  * Adds a sighting of a pet
