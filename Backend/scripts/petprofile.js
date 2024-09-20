@@ -76,7 +76,6 @@ async function createPetProfile(
 		latitude: latitude,
 		longitude: longitude,
 		photoUrl: imageUrl,
-		taggedProfiles: [],
 	};
 	const petObj = await petprofiles.insertOne(pet);
 	response.token = petObj.insertedId;

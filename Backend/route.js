@@ -16,6 +16,7 @@ const {
 	addSighting,
 	getSightings,
 	getNearbySightings,
+	addTaggedProfile,
 	addAvatar,
 	setUserAvatar,
 	getUserAvatar,
@@ -178,6 +179,15 @@ router.post("/getNearbySightings", getNearbySightings);
  * @returns - Success message or error message
  */
 router.post("/addAvatar", upload.single("avatarImg"), addAvatar);
+
+/**
+ * Add a tagged profile to a pet profile
+ * @paramtype raw json
+ * @param sightingToken - sightings to add tagged profile to
+ * @param petToken - pet associated with sighting
+ * @param userToken - user that added the tag
+ */
+router.post("/addTaggedProfile", addTaggedProfile);
 
 /**
  * Set user avatar

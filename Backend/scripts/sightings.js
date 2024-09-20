@@ -47,6 +47,7 @@ async function createSighting(
 		location: location,
 		latitude: latitude,
 		longitude: longitude,
+		taggedProfiles: {},
 		date: date,
 	};
 	const sightingObj = await sightings.insertOne(sighting);
@@ -85,8 +86,31 @@ async function retrieveNearbySightings(latitude, longitude) {
 	return sightingObjects;
 }
 
+async function appendTaggedProfile(sightingToken, petToken, userToken) {
+	const response = {};
+	const client = await getClient();
+	const database = client.db("petfinder");
+	const sightings = database.collection("sightings");
+	await sightings.updateOne(
+		{ _id: new mongoose.Types.ObjectId(sightingToken) },
+		{
+			$setOnInsert: { taggedProfiles: {} },
+		},
+		{ upsert: false }
+	);
+	await sightings.updateOne(
+		{ _id: new mongoose.Types.ObjectId(sightingToken) },
+		{
+			$push: { [`taggedProfiles.${petToken}`]: userToken },
+		}
+	);
+	response.success = "Sucessfully added tagged profile to sighting";
+	return response;
+}
+
 module.exports = {
 	createSighting,
 	returnSightings,
 	retrieveNearbySightings,
+	appendTaggedProfile,
 };

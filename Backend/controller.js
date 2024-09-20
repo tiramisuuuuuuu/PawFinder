@@ -21,6 +21,7 @@ const {
 	createSighting,
 	returnSightings,
 	retrieveNearbySightings,
+	appendTaggedProfile,
 } = require("./scripts/sightings");
 
 const { returnLocation } = require("./google/maps");
@@ -127,6 +128,15 @@ async function getNearbySightings(req, res) {
 	res.send(result);
 }
 
+async function addTaggedProfile(req, res) {
+	result = await appendTaggedProfile(
+		req.body.sightingToken,
+		req.body.petToken,
+		req.body.userToken
+	);
+	res.send(result);
+}
+
 async function addAvatar(req, res) {
 	result = await addOneAvatar(req.file);
 	res.send(result);
@@ -168,6 +178,7 @@ module.exports = {
 	addSighting,
 	getSightings,
 	getNearbySightings,
+	addTaggedProfile,
 	addAvatar,
 	setUserAvatar,
 	getUserAvatar,
