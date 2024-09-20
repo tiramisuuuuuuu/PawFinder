@@ -12,6 +12,7 @@ import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { styles } from "./styles";
 import InputField from "../../components/InputField";
 import { Link, router } from "expo-router";
+import Constants from 'expo-constants';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // Delete after development
@@ -26,7 +27,7 @@ const createNewUser = async (
 	confirm_pwd: string
 ) => {
 	try {
-		const response = await fetch("http://192.168.1.166:4000/addUser/", {
+		const response = await fetch(`http://${Constants.expoConfig?.extra?.backendURL}/addUser/`, {
 			// Change localhost to your IP
 			method: "post",
 			headers: {
