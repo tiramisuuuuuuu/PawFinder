@@ -23,10 +23,12 @@ async function createSighting(
 	petToken,
 	photos,
 	description,
-	location
+	location,
+	latitude,
+	longitude
 ) {
 	const client = await getClient();
-	const repsonse = {};
+	const response = {};
 	const requiredFields = [userToken, petToken, photos, description, location];
 	if (requiredFields.includes(undefined) || requiredFields.includes(null)) {
 		response.error = "Missing one or more parameters.";
@@ -43,6 +45,8 @@ async function createSighting(
 		photos: urls,
 		description: description,
 		location: location,
+		latitude: latitude,
+		longitude: longitude,
 		date: date,
 	};
 	const sightingObj = await sightings.insertOne(sighting);
@@ -71,7 +75,18 @@ async function returnSightings(userToken) {
 	return sightingObjects;
 }
 
+async function retrieveNearbySightings(latitude, longitude) {
+	// TODO: update to get nearby sightings not all
+	const client = await getClient();
+	const database = client.db("petfinder");
+	const sightings = database.collection("sightings");
+
+	const sightingObjects = await sightings.find({}).toArray();
+	return sightingObjects;
+}
+
 module.exports = {
 	createSighting,
 	returnSightings,
+	retrieveNearbySightings,
 };

@@ -17,7 +17,11 @@ const {
 	retrievePetProfile,
 } = require("./scripts/petprofile");
 
-const { createSighting, returnSightings } = require("./scripts/sightings");
+const {
+	createSighting,
+	returnSightings,
+	retrieveNearbySightings,
+} = require("./scripts/sightings");
 
 const { returnLocation } = require("./google/maps");
 
@@ -78,6 +82,8 @@ async function addPetProfile(req, res) {
 		req.body.lastSeen,
 		req.body.petDescription,
 		req.body.assignedTasks,
+		req.body.latitude,
+		req.body.longitude,
 		req.file
 	);
 	res.send(result);
@@ -104,13 +110,20 @@ async function addSighting(req, res) {
 		req.body.petToken,
 		req.files,
 		req.body.description,
-		req.body.location
+		req.body.location,
+		req.body.latitude,
+		req.body.longitude
 	);
 	res.send(result);
 }
 
 async function getSightings(req, res) {
 	result = await returnSightings(req.body.userToken);
+	res.send(result);
+}
+
+async function getNearbySightings(req, res) {
+	result = await retrieveNearbySightings(req.body.userToken);
 	res.send(result);
 }
 
@@ -154,6 +167,7 @@ module.exports = {
 	getPetProfileByID,
 	addSighting,
 	getSightings,
+	getNearbySightings,
 	addAvatar,
 	setUserAvatar,
 	getUserAvatar,

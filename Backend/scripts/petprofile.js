@@ -7,7 +7,7 @@ const fs = require("fs");
 async function getPhotoUrl(photo) {
 	const imageBuffer = fs.readFileSync(photo.path);
 	const uint8Array = new Uint8Array(imageBuffer);
-	const photoRef = ref(storage, `sightings/${photo.filename}`);
+	const photoRef = ref(storage, `petProfiles/${photo.filename}`);
 	await uploadBytes(photoRef, uint8Array);
 	const url = await getDownloadURL(photoRef);
 	return url;
@@ -23,6 +23,8 @@ async function createPetProfile(
 	lastSeen,
 	petDescription,
 	assignedTasks,
+	latitude,
+	longitude,
 	petImage
 ) {
 	const client = await getClient();
@@ -36,11 +38,26 @@ async function createPetProfile(
 		lastSeen,
 		petDescription,
 		assignedTasks,
+		latitude,
+		longitude,
 		petImage,
 	];
 	if (requiredFields.includes(undefined) || requiredFields.includes(null)) {
 		response.error = "Missing one or more parameters.";
-		return repsonse;
+		console.log(
+			userToken,
+			username,
+			contact,
+			petName,
+			petBreed,
+			lastSeen,
+			petDescription,
+			assignedTasks,
+			longitude,
+			latitude,
+			petImage
+		);
+		return response;
 	}
 	const database = client.db("petfinder");
 	const petprofiles = database.collection("petprofiles");
@@ -56,7 +73,10 @@ async function createPetProfile(
 		lastSeen: lastSeen,
 		petDescription: petDescription,
 		assignedTasks: assignedTasks,
+		latitude: latitude,
+		longitude: longitude,
 		photoUrl: imageUrl,
+		taggedProfiles: [],
 	};
 	const petObj = await petprofiles.insertOne(pet);
 	response.token = petObj.insertedId;
