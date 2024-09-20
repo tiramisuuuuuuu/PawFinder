@@ -131,6 +131,7 @@ async function getUserAvatar(req, res) {
 
 async function getAvatars(req, res) {
 	result = await getAllAvatars();
+	res.send(result);
 }
 
 async function getLocation(req, res) {
