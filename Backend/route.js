@@ -15,6 +15,8 @@ const {
 	getPetProfileByID,
 	addSighting,
 	getSightings,
+	getNearbySightings,
+	addTaggedProfile,
 	addAvatar,
 	setUserAvatar,
 	getUserAvatar,
@@ -107,7 +109,9 @@ router.post("/getUserBadges", getUserBadges);
  * @param lastSeen - location the pet was last seen
  * @param petDescription - description of the pet
  * @param assignedTasks - tasks assigned
- * @param petImage - image of the lost petpet
+ * @param petImage - image of the lost pet
+ * @param longitude - longitude of owner
+ * @param latitude - latitude of owner
  * @returns pet profile token
  */
 router.post("/addPetProfile", upload.single("petImage"), addPetProfile);
@@ -145,6 +149,8 @@ router.post("/getPetProfileByID", getPetProfileByID);
  * @param photos - photos of the sighting
  * @param description - description of the sighting
  * @param location - location of where sighting occured
+ * @param latitude - latitude of location
+ * @param longitude - longitude of location
  * @returns - Success or error message
  */
 router.post("/addSighting", upload.array("photos", 10), addSighting);
@@ -158,12 +164,30 @@ router.post("/addSighting", upload.array("photos", 10), addSighting);
 router.post("/getSightings", getSightings);
 
 /**
+ * Get nearby sightings of a user
+ * @paramtype raw json
+ * @param latitude - latitude of the user
+ * @param longitude - longitude of the user
+ * @returns - list of sighting objects nearby
+ */
+router.post("/getNearbySightings", getNearbySightings);
+
+/**
  * Adds one avatar to the database
  * @paramtype form data
  * @param avatarImg - image of the avatar
  * @returns - Success message or error message
  */
 router.post("/addAvatar", upload.single("avatarImg"), addAvatar);
+
+/**
+ * Add a tagged profile to a pet profile
+ * @paramtype raw json
+ * @param sightingToken - sightings to add tagged profile to
+ * @param petToken - pet associated with sighting
+ * @param userToken - user that added the tag
+ */
+router.post("/addTaggedProfile", addTaggedProfile);
 
 /**
  * Set user avatar
