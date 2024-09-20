@@ -31,28 +31,28 @@ export default function Home() {
             if (value != null) {
                 initialLatLng.current = value;
                 setLatLng(value);
-            }
+                }
             else {
                 let geocode = await getCurrLocation();
                 if (geocode != "") {
                     await AsyncStorage.setItem('last_search_latlng', geocode);
                     initialLatLng.current = geocode;
                     setLatLng(geocode);
-                }
+                    }
                 else {
                     initialLatLng.current = latLng; //rerendering is not necessary as search results are already loaded for this place on mount
-                }
+                    }
                 
-            }
+                }
         }
         
         initializeSearch();
-    }, [])
+    }, []);
 
     if (initialLatLng.current == "") { return <LoadingScreen /> }
     return (
         <SafeAreaView style={{flex: 1, backgroundColor: '#f1f3f9'}}>
-            <ScrollView contentContainerStyle={styles.container} nestedScrollEnabled={true} keyboardShouldPersistTaps="handled">
+            <ScrollView contentContainerStyle={{alignItems: 'center'}} nestedScrollEnabled={true} keyboardShouldPersistTaps="handled">
                 <View style={{width: 300, paddingTop: 50, flexDirection: 'column-reverse'}}>
                     <PetProfilesList latLng={latLng} />
                     <PlacesSearch initialLatLng={initialLatLng.current} setLatLng={setLatLng} getCurrLocation={getCurrLocation} />
@@ -62,9 +62,3 @@ export default function Home() {
         </SafeAreaView>
     )
 }
-
-const styles = StyleSheet.create({
-    container: {
-        alignItems: 'center',
-    },
-});

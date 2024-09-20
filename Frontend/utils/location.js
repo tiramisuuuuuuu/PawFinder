@@ -3,7 +3,6 @@ import Constants from 'expo-constants';
 export async function getLocation(lat, long) {
     try {
         const targetUrl = `http://${Constants.expoConfig?.extra?.backendURL}/getLocation/`;
-        console.log(targetUrl)
         const response = await fetch(targetUrl, {
             method: "post",
             headers: {

@@ -5,9 +5,9 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 export default function BackButton() {
     return (
         <View>
-            {router.canGoBack() && <Pressable onPressIn={()=>{router.back()}} style={{alignSelf: 'flex-start', flexDirection: 'row', marginTop: 15, marginLeft: 50}}>
+            {router.canGoBack() && <Pressable onPressIn={()=>{router.back()}} style={{alignSelf: 'flex-start', flexDirection: 'row', marginTop: 15, marginLeft: 50, alignItems: 'center'}}>
                 <MaterialCommunityIcons name="arrow-left" size={24} color="blue" />
-                <Text style={{color: 'blue', fontSize: 18}}>Back</Text></Pressable>}
+                <Text style={{color: 'blue', fontFamily: 'LilitaOne-Regular', fontSize: 25}}>Back</Text></Pressable>}
         </View>
     )
 }
