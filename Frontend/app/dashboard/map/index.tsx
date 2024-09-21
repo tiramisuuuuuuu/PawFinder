@@ -109,6 +109,7 @@ export default function MapPage() {
             </View>}
         </View>
     )
+
 }
 
 const styles = StyleSheet.create({

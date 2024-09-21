@@ -23,10 +23,12 @@ async function createSighting(
 	petToken,
 	photos,
 	description,
-	location
+	location,
+	latitude,
+	longitude
 ) {
 	const client = await getClient();
-	const repsonse = {};
+	const response = {};
 	const requiredFields = [userToken, petToken, photos, description, location];
 	if (requiredFields.includes(undefined) || requiredFields.includes(null)) {
 		response.error = "Missing one or more parameters.";
@@ -43,6 +45,9 @@ async function createSighting(
 		photos: urls,
 		description: description,
 		location: location,
+		latitude: latitude,
+		longitude: longitude,
+		taggedProfiles: {},
 		date: date,
 	};
 	const sightingObj = await sightings.insertOne(sighting);
@@ -71,7 +76,41 @@ async function returnSightings(userToken) {
 	return sightingObjects;
 }
 
+async function retrieveNearbySightings(latitude, longitude) {
+	// TODO: update to get nearby sightings not all
+	const client = await getClient();
+	const database = client.db("petfinder");
+	const sightings = database.collection("sightings");
+
+	const sightingObjects = await sightings.find({}).toArray();
+	return sightingObjects;
+}
+
+async function appendTaggedProfile(sightingToken, petToken, userToken) {
+	const response = {};
+	const client = await getClient();
+	const database = client.db("petfinder");
+	const sightings = database.collection("sightings");
+	await sightings.updateOne(
+		{ _id: new mongoose.Types.ObjectId(sightingToken) },
+		{
+			$setOnInsert: { taggedProfiles: {} },
+		},
+		{ upsert: false }
+	);
+	await sightings.updateOne(
+		{ _id: new mongoose.Types.ObjectId(sightingToken) },
+		{
+			$push: { [`taggedProfiles.${petToken}`]: userToken },
+		}
+	);
+	response.success = "Sucessfully added tagged profile to sighting";
+	return response;
+}
+
 module.exports = {
 	createSighting,
 	returnSightings,
+	retrieveNearbySightings,
+	appendTaggedProfile,
 };
