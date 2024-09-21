@@ -1,4 +1,19 @@
+import * as Location from 'expo-location';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import Constants from 'expo-constants';
+
+export async function getCurrLocation() {                                                                                                                  
+    let { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== 'granted') {
+      console.log('Permission to access location was denied');
+      return "";
+    }
+
+    let pos = (await Location.getCurrentPositionAsync({})).coords;
+    let geocode = `${pos.latitude}, ${pos.longitude}`;
+    await AsyncStorage.setItem('latlng', geocode);
+    return geocode;
+}
 
 export async function getLocation(lat, long) {
     try {

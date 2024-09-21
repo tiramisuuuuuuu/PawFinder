@@ -1,20 +1,20 @@
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { useEffect, useState, useRef } from "react";
-import { getLocation } from "@/utils/location"
+import { getCurrLocation, getLocation } from "@/utils/location"
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import Constants from 'expo-constants';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 
-export default function PlacesSearch({initialLatLng, setLatLng, getCurrLocation}) {
+export default function PlacesSearch({initialLatLng, setLatLng, storeLatLngHistory}) {
     const ref = useRef();
     const [editable, setEditable] = useState(false);
     const iconPressCount = useRef(0);
     
     async function selectLoc_handler(details) {
         if (details) {
-            const geocode = `${details.geometry?.location.lat}, ${details.geometry?.location.lat}`;
-            await AsyncStorage.setItem('last_search_latlng', geocode);
+            const geocode = `${details.geometry?.location.lat}, ${details.geometry?.location.lng}`;
+            if (storeLatLngHistory) { await AsyncStorage.setItem('last_search_latlng', geocode) }
             setLatLng(geocode);
         }
     }
@@ -28,7 +28,7 @@ export default function PlacesSearch({initialLatLng, setLatLng, getCurrLocation}
             console.log("getting current location");
             const geocode = await getCurrLocation();
             if (geocode != "") {
-                await AsyncStorage.setItem('last_search_latlng', geocode);
+                if (storeLatLngHistory) { await AsyncStorage.setItem('last_search_latlng', geocode) }
                 setLatLng(geocode);
                 let [lat, long] = geocode.split(", ");
                 const value = await getLocation(Number(lat), Number(long));
@@ -42,6 +42,7 @@ export default function PlacesSearch({initialLatLng, setLatLng, getCurrLocation}
 
     useEffect(()=>{
         async function initialize() {
+            if (initialLatLng == "") { return }
             let [lat, long] = initialLatLng.split(", ");
             const value = await getLocation(Number(lat), Number(long));
             await ref.current?.setAddressText(value);
@@ -52,7 +53,7 @@ export default function PlacesSearch({initialLatLng, setLatLng, getCurrLocation}
     }, [])
 
     return (
-        <View style={{width: '100%', height: 50, backgroundColor: 'transparent', justifyContent: 'center', alignItems: 'flex-end'}}>
+        <View style={{width: 300, height: 50, backgroundColor: 'transparent', justifyContent: 'center', alignItems: 'flex-end'}}>
             <View style={{width: '90%', height: 300, position: 'absolute', top: 0, left: 0}}>
                 <GooglePlacesAutocomplete
                     ref={ref}

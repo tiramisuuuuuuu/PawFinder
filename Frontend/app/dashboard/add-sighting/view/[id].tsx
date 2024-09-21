@@ -91,14 +91,6 @@ export default function Home() {
                         </View>
                         <Text style={{marginTop: 20, width: '100%', fontFamily: 'LilitaOne-Regular', fontSize: 20, paddingLeft: 10}}>Assigned Tasks</Text>
                         <Text style={[{marginTop: 30}, styles.text]}>{`**${profile.assignedTasks}**`}</Text>
-                        <Pressable style={{marginTop: 40, paddingTop: 5, paddingBottom: 5, paddingRight: 15, paddingLeft: 15, backgroundColor: 'lightcyan', borderWidth: 2, borderColor: 'purple', borderRadius: 20}}>
-                            <Link href={`./report/${profile._id}`} onPress={()=>{console.log("add sighting pressed")}}>
-                                <View style={{justifyContent: 'center', alignItems: 'center', flexDirection: 'row'}}>
-                                    <Text style={{fontFamily: 'Poppins-Regular', fontSize: 20, color: 'purple', marginRight: 5}}>Add Sighting</Text>
-                                    <MaterialCommunityIcons name="plus-circle-outline" size={30} color="purple" />
-                                </View>
-                            </Link>
-                        </Pressable>
                     </View>
                 </View>
                 

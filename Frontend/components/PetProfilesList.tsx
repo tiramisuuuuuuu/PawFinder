@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import Constants from 'expo-constants';
 
 
-async function getPetProfiles(lat: Number, lng: Number) {
+async function getNearbyPetProfiles(lat: Number, lng: Number) {
     try {
         const targetUrl = `http://${Constants.expoConfig?.extra?.backendURL}/getNearbyPetProfiles/`;
         const response = await fetch(targetUrl, {
@@ -34,10 +34,10 @@ export default function PetProfilesList({latLng}) {
     useEffect(()=>{
         async function initialize() {
             const [lat, lng] = latLng.split(', ')
-            const resultsArr = await getPetProfiles(Number(lat), Number(lng));
+            const resultsArr = await getNearbyPetProfiles(Number(lat), Number(lng));
             if (resultsArr != null) {
                 setPetProfiles(resultsArr);
-            }
+                }
         }
 
         initialize();
@@ -55,17 +55,21 @@ export default function PetProfilesList({latLng}) {
                             {(profile.petSpecies=="dog" || profile.petSpecies=="cat") && <FontAwesome5 name={profile.petSpecies} size={20} color="orange" style={{marginRight: 15}} />}
                             <Text style={{flex: 1, fontFamily: 'Poppins-Regular', fontSize: 15}}>{profile.petBreed}</Text>
                         </View>
-                        <View style={{flexDirection: 'row', width: '100%', marginBottom: 10, alignItems: 'center', justifyContent: 'flex-start'}}>
-                            <Text style={{fontFamily: 'Poppins-Regular', fontSize: 12, marginRight: 5}}>
-                                <Text style={{color: 'grey'}}>Posted: </Text>
-                                <Text>{profile.postedDate}</Text>
-                            </Text>
-                            <FontAwesome name="clock-o" size={15} color="grey" style={{marginRight: 15}} />
-                            <Text style={{fontFamily: 'Poppins-Regular', fontSize: 12, marginRight: 5}}>
-                                <Text style={{color: 'grey'}}>Last Seen: </Text>
-                                <Text>{profile.lastSeen}</Text>
-                            </Text>
-                            <FontAwesome name="map-pin" size={15} color="grey" />
+                        <View style={{flexDirection: 'row', width: '100%', marginBottom: 10, alignItems: 'center', justifyContent: 'flex-start', columnGap: 5}}>
+                            <View style={{flexDirection: 'row', width: '50%', alignItems: 'center', justifyContent: 'flex-start'}}>
+                                <Text style={{fontFamily: 'Poppins-Regular', fontSize: 12, marginRight: 5}}>
+                                    <Text style={{color: 'grey'}}>Posted: </Text>
+                                    <Text>{profile.postedDate}</Text>
+                                </Text>
+                                <FontAwesome name="clock-o" size={15} color="grey" style={{marginRight: 15}} />
+                            </View>
+                            <View style={{flexDirection: 'row', width: '50%', alignItems: 'center', justifyContent: 'flex-start'}}>
+                                <Text style={{fontFamily: 'Poppins-Regular', fontSize: 12, marginRight: 5}}>
+                                    <Text style={{color: 'grey'}}>Last Seen: </Text>
+                                    <Text>{profile.lastSeen}</Text>
+                                </Text>
+                                <FontAwesome name="map-pin" size={15} color="grey" />
+                            </View>
                         </View>
                         <Text ellipsizeMode='tail' numberOfLines={2} style={{width: '100%', textAlign: 'left', fontFamily: 'Poppins-Regular', fontSize: 15, marginBottom: 10}}>{profile. petDescription}</Text>
                         <Pressable style={{marginTop: 5, paddingTop: 5, paddingBottom: 5, paddingRight: 10, paddingLeft: 10, backgroundColor: 'teal', borderRadius: 10}}>
