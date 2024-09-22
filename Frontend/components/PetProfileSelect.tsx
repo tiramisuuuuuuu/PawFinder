@@ -126,12 +126,14 @@ export default function PetProfileSelect({initialSelection, updateParentSelected
         }
 
         initialize();
-    }, [])
+    }, [latLng])
     return (
         <View style={{width: 300, alignSelf: 'center', marginBottom: 15}}>
-            <TextInput placeholder="Search by pet profile id" onChangeText={(newText)=>{input.current=newText}} onSubmitEditing={()=>{setSearching(true)}} editable={!searching} style={{width: '100%', marginBottom: 10, padding: 5, paddingLeft: 10, paddingRight: 10, fontFamily: 'Poppins-Regular', fontSize: 17, borderRadius: 20, borderWidth: 1, borderColor: error ? 'red' : 'grey', backgroundColor: searching ? 'lavender' : 'white'}} />
+            <View style={{borderBottomWidth: 1, height: 45, borderRadius: 8, borderColor: 'grey', backgroundColor: 'grey'}}>
+                <TextInput placeholder="Search by pet profile id" onChangeText={(newText)=>{input.current=newText}} onSubmitEditing={()=>{setSearching(true)}} editable={!searching} style={{width: 300, height: 40, marginBottom: 10, padding: 5, paddingLeft: 10, paddingRight: 10, fontFamily: 'Poppins-Regular', fontSize: 16, borderRadius: 7, borderColor: error ? 'red' : 'grey', backgroundColor: searching ? 'lavender' : 'white'}} />
+            </View>
             {error && <Text style={{fontFamily: 'Poppins-Regular', fontSize: 15, color: 'red', padding: 20, paddingTop: 0}}>** No search results found at this time.</Text>}
-            <View style={{width: '100%', height: 300}}><ScrollView>
+            <View style={{width: '100%', maxHeight: 300}}><ScrollView>
             <View style={{width: '100%', rowGap: 5}}>
                 {Object.values(selected).map((profile)=>{ 
                     if (disableRemove && selected.hasOwnProperty(profile._id)) { return }

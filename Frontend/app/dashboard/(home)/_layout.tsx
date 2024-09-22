@@ -5,7 +5,7 @@ export default function HomeLayout() {
         <Stack screenOptions={{headerShown: false}}>
             <Stack.Screen name="index" />
             <Stack.Screen name="view/[id]" />
-            <Stack.Screen name="report" />
+            <Stack.Screen name="create-pet-profile" />
         </Stack>
     )
 }
