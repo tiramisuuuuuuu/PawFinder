@@ -1,5 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Avatar, User, Sightings, URL, Badge } from "./types";
+import { Avatar, User, Sightings, URL, Badge, Result } from "./types";
 import Constants from "expo-constants";
 
 export async function getToken(): Promise<string> {
@@ -77,7 +77,7 @@ export async function getUserInfo(token: string): Promise<any> {
 		return result;
 	} catch (err) {
 		console.error("Network issue:", err);
-		const result: User = {};
+		const result: User = { passwordLength: 0 };
 		return result;
 	}
 }
@@ -169,5 +169,35 @@ export async function retrieveUserBadges(token: string): Promise<Badge[]> {
 	} catch (err) {
 		console.error("Network issue:", err);
 		return [];
+	}
+}
+
+export async function setUserField(
+	userToken: string,
+	element: string,
+	newValue: string
+): Promise<Result> {
+	try {
+		const response = await fetch(
+			`http://${Constants.expoConfig?.extra?.backendURL}/editUserField/`,
+			{
+				method: "post",
+				headers: {
+					Accept: "application/json",
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					userToken: userToken,
+					element: element,
+					newValue: newValue,
+				}),
+			}
+		);
+		const result: Result = await response.json();
+		return result;
+	} catch (err) {
+		console.error("Network issue:", err);
+		const result: Result = { error: "Network issue" };
+		return result;
 	}
 }

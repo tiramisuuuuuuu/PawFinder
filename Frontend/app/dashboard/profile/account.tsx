@@ -3,6 +3,7 @@ import {
 	View,
 	StyleSheet,
 	Text,
+	TextInput,
 	TouchableOpacity,
 } from "react-native";
 import { Image } from "expo-image";
@@ -10,20 +11,17 @@ import { useEffect, useState } from "react";
 import { router } from "expo-router";
 import {
 	getToken,
-	getAvatars,
-	getAvatarURL,
 	getUserInfo,
-	changeUserAvatar,
-	userSightingsNum,
 	retrieveUserBadges,
+	setUserField,
 } from "./core/services";
 import { Avatar, User, Sightings, URL, Badge } from "./core/types";
 
 const icons = {
 	backArrow:
 		"https://firebasestorage.googleapis.com/v0/b/pawfinder-1f103.appspot.com/o/static%2Fweui_back-filled.png?alt=media&token=405b2d34-14c9-4272-8949-2c6915efe66a",
-	edit: "https://firebasestorage.googleapis.com/v0/b/pawfinder-1f103.appspot.com/o/static%2FbadgeImage.png?alt=media&token=9e4509ab-8913-45d4-a349-bbd8b5c2e945",
 	badge: "https://firebasestorage.googleapis.com/v0/b/pawfinder-1f103.appspot.com/o/static%2Fcarbon_badge.png?alt=media&token=79f9aafd-e9fa-4ac6-87b3-2a668dc9d24c",
+	submit: "https://firebasestorage.googleapis.com/v0/b/pawfinder-1f103.appspot.com/o/static%2Fsubmit.png?alt=media&token=90ba09ba-8ac5-4966-86ee-db1fd9ca6d20",
 };
 
 const backButtonPress = () => {
@@ -31,16 +29,21 @@ const backButtonPress = () => {
 };
 
 export default function Account() {
-	const [user, setUser] = useState<User>({});
+	const [user, setUser] = useState<User>({ passwordLength: 0 });
 	const [badges, setBadges] = useState<Badge[]>([]);
+	const [username, setUsername] = useState("");
+	const [password, setPassword] = useState("");
+	const [email, setEmail] = useState("");
+	const [error, setError] = useState("");
+
+	const loadUserInfo = async () => {
+		const token = await getToken();
+		if (token) {
+			setUser(await getUserInfo(token));
+		}
+	};
 
 	useEffect(() => {
-		const loadUserInfo = async () => {
-			const token = await getToken();
-			if (token) {
-				setUser(await getUserInfo(token));
-			}
-		};
 		const getBadges = async () => {
 			const token = await getToken();
 			if (token) {
@@ -50,6 +53,42 @@ export default function Account() {
 		loadUserInfo();
 		getBadges();
 	}, []);
+
+	const onSubmitUsername = async () => {
+		const token = await getToken();
+		const result = await setUserField(token, "username", username);
+		if (result.error) {
+			setError(result.error);
+		} else {
+			setUsername("");
+			setError("");
+			loadUserInfo();
+		}
+	};
+
+	const onSubmitPassword = async () => {
+		const token = await getToken();
+		const result = await setUserField(token, "password", password);
+		if (result.error) {
+			setError(result.error);
+		} else {
+			setPassword("");
+			setError("");
+			loadUserInfo();
+		}
+	};
+
+	const onSubmitEmail = async () => {
+		const token = await getToken();
+		const result = await setUserField(token, "email", email);
+		if (result.error) {
+			setError(result.error);
+		} else {
+			setEmail("");
+			setError("");
+		}
+	};
+
 	return (
 		<ScrollView contentContainerStyle={styles.container}>
 			<View style={styles.infoContainer}>
@@ -68,7 +107,7 @@ export default function Account() {
 							style={styles.sectionImage}
 							source={icons.badge}
 						/>
-						<Text style={styles.sectionTitle}>Details</Text>
+						<Text style={styles.sectionTitle}>Edit Details</Text>
 					</View>
 					<View style={styles.details}>
 						<View style={styles.detailsTitles}>
@@ -81,39 +120,75 @@ export default function Account() {
 						</View>
 						<View style={styles.detailsValues}>
 							<View style={styles.detailValue}>
-								<Text style={styles.detailTitle}>
-									{user.username}
-								</Text>
-								<Image
-									style={styles.edit}
-									source={icons.edit}
-								></Image>
+								<TextInput
+									numberOfLines={1}
+									style={styles.value}
+									placeholder={user.username}
+									placeholderTextColor="grey"
+									value={username}
+									onChangeText={setUsername}
+								></TextInput>
+								<TouchableOpacity
+									style={styles.submitButton}
+									onPress={onSubmitUsername}
+								>
+									<Image
+										style={styles.submit}
+										source={icons.submit}
+									></Image>
+								</TouchableOpacity>
 							</View>
 							<View style={styles.detailValue}>
-								<Text style={styles.detailTitle}>
-									{user.username}
-								</Text>
-								<Image
-									style={styles.edit}
-									source={icons.edit}
-								></Image>
+								<TextInput
+									placeholderTextColor="grey"
+									numberOfLines={1}
+									placeholder={"*".repeat(
+										user.passwordLength
+									)}
+									secureTextEntry={true}
+									style={styles.value}
+									value={password}
+									onChangeText={setPassword}
+								></TextInput>
+								<TouchableOpacity
+									style={styles.submitButton}
+									onPress={onSubmitPassword}
+								>
+									<Image
+										style={styles.submit}
+										source={icons.submit}
+									></Image>
+								</TouchableOpacity>
 							</View>
 							<View style={styles.detailValue}>
-								<Text style={styles.detailTitle}>
-									{user.email}
-								</Text>
-								<Image
-									style={styles.edit}
-									source={icons.edit}
-								></Image>
+								<TextInput
+									numberOfLines={1}
+									style={styles.value}
+									placeholder={user.email}
+									placeholderTextColor="grey"
+									value={email}
+									onChangeText={setEmail}
+								></TextInput>
+								<TouchableOpacity
+									style={styles.submitButton}
+									onPress={onSubmitEmail}
+								>
+									<Image
+										style={styles.submit}
+										source={icons.submit}
+									></Image>
+								</TouchableOpacity>
 							</View>
 							<View style={styles.detailValue}>
-								<Text style={styles.detailTitle}>
-									{user.username}
+								<Text style={styles.value}>
+									{user.dateCreated}
 								</Text>
 							</View>
 						</View>
 					</View>
+					{error.length !== 0 && (
+						<Text style={styles.error}>{error}</Text>
+					)}
 				</View>
 				<View style={styles.badges}>
 					<View style={styles.sectionBar}>
@@ -164,6 +239,7 @@ const styles = StyleSheet.create({
 		fontSize: 20,
 	},
 	sectionImage: {
+		flex: 0.1,
 		height: 35,
 		width: 35,
 		marginRight: 5,
@@ -172,6 +248,12 @@ const styles = StyleSheet.create({
 	sectionBar: {
 		flexDirection: "row",
 		marginBottom: 10,
+		width: "100%",
+	},
+	error: {
+		color: "red",
+		fontFamily: "Poppins-Regular",
+		textAlign: "center",
 	},
 	// Title container
 	title: {
@@ -211,26 +293,37 @@ const styles = StyleSheet.create({
 		width: "100%",
 	},
 	detailsTitles: {
-		flex: 1,
+		flex: 0.65,
 		flexDirection: "column",
 	},
 	detailTitle: {
 		fontFamily: "Poppins-Regular",
-		fontSize: 17,
+		fontSize: 15,
+		marginVertical: 5,
 	},
 	detailsValues: {
-		flex: 0.7,
+		flex: 1,
 		flexDirection: "column",
 	},
-	detailValue: {
-		flexDirection: "row",
-		gap: 40,
+	value: {
+		flex: 1,
+		fontFamily: "Poppins-Regular",
+		fontSize: 15,
 	},
-	edit: {
-		height: 22,
-		width: 20,
+	detailValue: {
+		flex: 1,
+		flexDirection: "row",
+		gap: 15,
+		marginVertical: 5,
+	},
+	submitButton: {
+		flex: 0.1,
 		resizeMode: "center",
 		alignSelf: "center",
+	},
+	submit: {
+		height: 20,
+		width: 25,
 	},
 	// Badges
 	badges: {

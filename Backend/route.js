@@ -6,6 +6,7 @@ const {
 	addUser,
 	authenticateUser,
 	getUser,
+	editUserField,
 	addBadge,
 	addUserBadge,
 	getUserBadges,
@@ -80,6 +81,16 @@ router.post("/getUser", getUser);
  * @returns badge token or error
  */
 router.post("/addBadge", upload.single("badgeImage"), addBadge);
+
+/**
+ * Edit user field
+ * @paramtype for data
+ * @param userToken - user to change field data
+ * @param element - the field to change
+ * @param newValue - new value for the field
+ * @returns success or error
+ */
+router.post("/editUserField", editUserField);
 
 /**
  * Adds a badge to the user

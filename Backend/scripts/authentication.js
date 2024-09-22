@@ -39,6 +39,20 @@ async function defaultAvatar() {
 	return avatars[0]._id;
 }
 
+async function updateUserField(users, userToken, newValue, field) {
+	if (field === "password") {
+		await users.updateOne(
+			{ _id: new mongoose.Types.ObjectId(userToken) },
+			{ $set: { passwordLength: newValue.length } }
+		);
+		newValue = await encryptPassword(newValue);
+	}
+	await users.updateOne(
+		{ _id: new mongoose.Types.ObjectId(userToken) },
+		{ $set: { [field]: newValue } }
+	);
+}
+
 // MAIN FUNCTIONS
 async function verifyUser(username, password) {
 	const client = await getClient();
@@ -94,12 +108,15 @@ async function createUserEntry(username, email, password, confirmPassword) {
 	}
 	const hashedPassword = await encryptPassword(password);
 	const avatar = await defaultAvatar();
+	const curDate = new Date().toLocaleDateString();
 	const user = {
 		username: username,
 		email: email,
 		password: hashedPassword,
 		badges: [],
 		avatar: avatar.toString(),
+		dateCreated: curDate,
+		passwordLength: password.length,
 	};
 	const inserted = await users.insertOne(user);
 	response.token = inserted.insertedId;
@@ -118,11 +135,47 @@ async function getUserInfo(userToken) {
 		response.error = "No user with the username found.";
 		return response;
 	}
+	delete user.password;
 	return user;
+}
+
+async function changeUserElement(userToken, element, newValue) {
+	const response = {};
+	const client = await getClient();
+	const database = client.db("petfinder");
+	const users = database.collection("users");
+	const user = await users.findOne({
+		_id: new mongoose.Types.ObjectId(userToken),
+	});
+	if (!user) {
+		response.error = "No user with the username found.";
+		return response;
+	}
+	if (element === "username") {
+		const user = await users.findOne({
+			username: newValue,
+		});
+		if (user) {
+			response.error = "Username taken. Choose another one";
+			return response;
+		}
+		updateUserField(users, userToken, newValue, "username");
+		response.success = "Sucessfully updated username!";
+	} else if (element === "email") {
+		updateUserField(users, userToken, newValue, "email");
+		response.success = "Sucessfully updated email!";
+	} else if (element === "password") {
+		updateUserField(users, userToken, newValue, "password");
+		response.success = "Sucessfully updated password!";
+	} else {
+		response.error = "The requested field name does not exist.";
+	}
+	return response;
 }
 
 module.exports = {
 	createUserEntry,
 	verifyUser,
 	getUserInfo,
+	changeUserElement,
 };

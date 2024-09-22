@@ -7,9 +7,10 @@ export type User = {
 	_id?: string;
 	username?: string;
 	email?: string;
-	password?: string;
 	badges?: string[];
 	avatar?: string;
+	dateCreated?: string;
+	passwordLength: number;
 };
 
 export type Sightings = {
@@ -29,4 +30,9 @@ export type Badge = {
 	_id: string;
 	badgeName?: string;
 	badgeImageURL?: string;
+};
+
+export type Result = {
+	success?: string;
+	error?: string;
 };

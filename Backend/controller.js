@@ -2,6 +2,7 @@ const {
 	createUserEntry,
 	verifyUser,
 	getUserInfo,
+	changeUserElement,
 } = require("./scripts/authentication");
 
 const {
@@ -55,6 +56,15 @@ async function authenticateUser(req, res) {
 
 async function getUser(req, res) {
 	result = await getUserInfo(req.body.userToken);
+	res.send(result);
+}
+
+async function editUserField(req, res) {
+	result = await changeUserElement(
+		req.body.userToken,
+		req.body.element,
+		req.body.newValue
+	);
 	res.send(result);
 }
 
@@ -171,6 +181,7 @@ module.exports = {
 	addBadge,
 	addUserBadge,
 	getUserBadges,
+	editUserField,
 	addPetProfile,
 	getPetProfiles,
 	getNearbyPetProfiles,
