@@ -8,195 +8,17 @@ import {
 import { Image } from "expo-image";
 import { useEffect, useState } from "react";
 import { router } from "expo-router";
-import Constants from "expo-constants";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import {
+	getToken,
+	getAvatars,
+	getAvatarURL,
+	getUserInfo,
+	changeUserAvatar,
+	userSightingsNum,
+	retrieveBadgeLength,
+} from "./core/services";
+import { Avatar, User, Sightings, URL, Badge } from "./core/types";
 
-type Avatar = {
-	_id: string;
-	avatarImageURL: string;
-};
-
-type User = {
-	_id?: string;
-	username?: string;
-	email?: string;
-	password?: string;
-	badges?: string[];
-	avatar?: string;
-};
-
-type Sightings = {
-	userToken: string;
-	petToken: string;
-	photos: string[];
-	description: string;
-	location: string;
-	date: string;
-};
-
-type URL = {
-	url?: string;
-};
-
-type Badge = {
-	badgeName?: string;
-	badgeImageURL?: string;
-};
-
-async function getToken(): Promise<string> {
-	try {
-		const value = await AsyncStorage.getItem("token");
-		if (value === null) {
-			return "";
-		}
-		return value;
-	} catch (error) {
-		console.error("Error getting token:", error);
-		return "";
-	}
-}
-
-async function getAvatars(): Promise<Avatar[]> {
-	try {
-		const response = await fetch(
-			`http://${Constants.expoConfig?.extra?.backendURL}/getAvatars/`,
-			{
-				// Change localhost to your IP
-				method: "get",
-				headers: {
-					Accept: "application/json",
-					"Content-Type": "application/json",
-				},
-			}
-		);
-		const result: Avatar[] = await response.json();
-		return result;
-	} catch (err) {
-		console.error("Network issue:", err);
-		return [];
-	}
-}
-
-async function getAvatarURL(token: string): Promise<string> {
-	try {
-		const response = await fetch(
-			`http://${Constants.expoConfig?.extra?.backendURL}/getUserAvatar/`,
-			{
-				// Change localhost to your IP
-				method: "post",
-				headers: {
-					Accept: "application/json",
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({
-					userToken: token,
-				}),
-			}
-		);
-		const result: URL = await response.json();
-		if (!result.url) {
-			return "";
-		}
-		return result.url;
-	} catch (err) {
-		console.error("Network issue:", err);
-		return "";
-	}
-}
-
-async function getUserInfo(token: string): Promise<any> {
-	try {
-		const response = await fetch(
-			`http://${Constants.expoConfig?.extra?.backendURL}/getUser/`,
-			{
-				// Change localhost to your IP
-				method: "post",
-				headers: {
-					Accept: "application/json",
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({
-					userToken: token,
-				}),
-			}
-		);
-		const result: User = await response.json();
-		return result;
-	} catch (err) {
-		console.error("Network issue:", err);
-		return [];
-	}
-}
-
-async function changeUserAvatar(userToken: string, avatarToken: string) {
-	try {
-		await fetch(
-			`http://${Constants.expoConfig?.extra?.backendURL}/setUserAvatar/`,
-			{
-				// Change localhost to your IP
-				method: "post",
-				headers: {
-					Accept: "application/json",
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({
-					userToken: userToken,
-					avatarToken: avatarToken,
-				}),
-			}
-		);
-	} catch (err) {
-		console.error("Network issue:", err);
-	}
-}
-
-async function userSightingsNum(userToken: string) {
-	try {
-		const response = await fetch(
-			`http://${Constants.expoConfig?.extra?.backendURL}/getSightings/`,
-			{
-				// Change localhost to your IP
-				method: "post",
-				headers: {
-					Accept: "application/json",
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({
-					userToken: userToken,
-				}),
-			}
-		);
-		const result: Sightings[] = await response.json();
-		return result.length;
-	} catch (err) {
-		console.error("Network issue:", err);
-		return 0;
-	}
-}
-
-async function retrieveUserBadges(token: string) {
-	try {
-		const response = await fetch(
-			`http://${Constants.expoConfig?.extra?.backendURL}/getUserBadges/`,
-			{
-				// Change localhost to your IP
-				method: "post",
-				headers: {
-					Accept: "application/json",
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({
-					userToken: token,
-				}),
-			}
-		);
-		const result: Badge[] = await response.json();
-		return result.length;
-	} catch (err) {
-		console.error("Network issue:", err);
-		return 0;
-	}
-}
 const handleButtonPress = () => {
 	router.push("./profile/account");
 };
@@ -236,7 +58,7 @@ export default function Profiles() {
 		const fetchBadges = async () => {
 			const token = await getToken();
 			if (token) {
-				setBadges(await retrieveUserBadges(token));
+				setBadges(await retrieveBadgeLength(token));
 			}
 		};
 		const loadUserInfo = async () => {
@@ -321,7 +143,9 @@ export default function Profiles() {
 								style={styles.sectionImage}
 								source={icons.medal}
 							/>
-							<Text style={styles.sectionTitle}>Badges</Text>
+							<Text style={styles.sectionTitle}>
+								Achievements
+							</Text>
 						</View>
 						<View style={styles.achievementsContainer}>
 							<Image
@@ -335,7 +159,7 @@ export default function Profiles() {
 						<View style={styles.achievementsContainer}>
 							<Image
 								style={styles.achievementIcon}
-								source={icons.petsFound}
+								source={icons.badges}
 							></Image>
 							<Text style={styles.achievementCount}>
 								Pets Found: 5
