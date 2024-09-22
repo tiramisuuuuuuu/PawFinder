@@ -14,6 +14,7 @@ import PetProfileSelect, { DisplayProfile } from "@/components/PetProfileSelect"
 import Constants from 'expo-constants';
 import {Callout} from 'react-native-maps';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
 
 
 async function getPetProfileByID(id: String) {
@@ -66,7 +67,7 @@ export function SightingModal({ sighting, setActiveSightingObj, updateSighting }
     const updatedTagsCount = useRef(0);
     let disableActions = (activeProfileId != "");
     const [initialPetProfileSelection, setInitialPetProfileSelection] = useState({});
-    console.log(sighting.taggedProfiles)
+
     function setOpenFunct(bool) {
         if (bool == false) {
             setActiveSightingObj(null);
@@ -131,9 +132,25 @@ export function SightingModal({ sighting, setActiveSightingObj, updateSighting }
     }, []);
     return (
         <Modal setOpenFunct={setOpenFunct}>
-            <View style={{width: 350, height: 500, padding: 20, backgroundColor: 'rgba(149, 165, 164, 0.8)', borderRadius: 20}}>
+            <View style={{width: 350, height: 500, padding: 20, backgroundColor: 'gainsboro', borderRadius: 20}}>
                 {!compIsReady && <LoadingScreen />}
                 {compIsReady && <ScrollView contentContainerStyle={{alignItems: 'center'}}>
+                <Text style={{width: '100%', textAlign: 'left', fontFamily: 'Poppins-Regular', fontSize: 20, marginBottom: 10, textDecorationLine: 'underline'}}>Sighting</Text>
+                    <Image source={{ uri: sighting.photos[0] }} resizeMode="contain" style={{width: '100%', height: 200}} />
+                    <View style={{flexDirection: 'row', width: '100%', marginTop: 10, marginBottom: 10, alignItems: 'center', justifyContent: 'flex-start'}}>
+                        <Text style={{fontFamily: 'Poppins-Regular', fontSize: 12, marginRight: 5}}>
+                            <Text style={{color: 'grey'}}>Posted: </Text>
+                            <Text>{sighting.date}</Text>
+                        </Text>
+                        <FontAwesome name="clock-o" size={15} color="grey" style={{marginRight: 15}} />
+                        <Text style={{fontFamily: 'Poppins-Regular', fontSize: 12, marginRight: 5}}>
+                            <Text style={{color: 'grey'}}>Location: </Text>
+                            <Text>{sighting.location}</Text>
+                        </Text>
+                        <FontAwesome name="map-pin" size={15} color="grey" />
+                    </View>
+                    <Text style={{width: '100%', textAlign: 'left', fontFamily: 'Poppins-Regular', fontSize: 15, marginBottom: 30}}>{sighting.description}</Text>
+                    
                     <Text style={{fontFamily: "Poppins-Regular", fontSize: 15, width: 300, marginBottom: 30}}>Tagged Pet Profiles</Text>
                     <View style={{marginBottom: 20, rowGap: 10}}>
                         {taggedProfiles.map((profile)=>{ 
@@ -161,6 +178,7 @@ export function SightingModal({ sighting, setActiveSightingObj, updateSighting }
                         </View>
                         <Text style={{fontFamily: "Poppins-Regular", fontSize: 15, width: 300, marginBottom: 30}}>Add a new tag:</Text>
                         <PetProfileSelect initialSelection={initialPetProfileSelection} updateParentSelected={tagNewProfile} path="map" disableRemove={true} disableActions={disableActions} />
+                        <Text style={{width: '100%', textAlign: 'right', fontFamily: 'Poppins-Regular', fontSize: 15}}>PawFinder</Text>
                     </ScrollView>}
                 </View>
         </Modal>

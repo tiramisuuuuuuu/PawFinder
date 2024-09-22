@@ -39,11 +39,13 @@ export function FilterModal({ setOpenFilter, filterList, updateFiltersRef}) {
 
 export function InfoModal({ setOpenInfo }) {
     return (
-        <Modal setOpenFunct={setOpenInfo}> 
-            <Text style={{fontFamily: 'Poppins-Regular', fontSize: 25, textDecorationLine: 'underline'}}>Welcome to the community sightings board!</Text>
-            <Text style={{fontFamily: 'Poppins-Regular', fontSize: 20}}>Help match sightings users have posted with pet profiles</Text>
-            <Text style={{fontFamily: 'Poppins-Regular', fontSize: 20}}>{"\n"}--OR-- Upvote tags that already exist on sightings!</Text>
-            <Text style={{fontFamily: 'Poppins-Regular', fontSize: 20}}>{"\n"}Select "filter" and visualize all tagged sightings collected for specific pet searches!</Text>
+        <Modal setOpenFunct={setOpenInfo}>
+            <Text style={{fontFamily: 'Poppins-Regular', fontSize: 20, padding: 20, color: 'blue'}}>
+                <Text style={{fontSize: 25, textDecorationLine: 'underline'}}>Welcome to the community sightings board!</Text>
+                <Text>{"\n\n"}Help tag sightings users have posted with pet profiles you believe they match with</Text>
+                <Text>{"\n"}--OR-- Upvote tags that already exist on sightings!</Text>
+                <Text>{"\n"}Select "filter" and visualize all tagged sightings collected for specific pet searches!</Text>
+            </Text>
         </Modal>
     )
 }

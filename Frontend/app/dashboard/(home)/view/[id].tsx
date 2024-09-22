@@ -76,7 +76,7 @@ export default function Home() {
                             </Text>
                             <FontAwesome name="map-pin" size={15} color="grey" />
                         </View>
-                        <Text style={{width: '100%', textAlign: 'left', fontFamily: 'Poppins-Regular', fontSize: 15, marginBottom: 10}}>{profile. petDescription}</Text>
+                        <Text style={{width: '100%', textAlign: 'left', fontFamily: 'Poppins-Regular', fontSize: 15, marginBottom: 10}}>{profile.petDescription}</Text>
                         <View style={{flexDirection: 'row', width: '100%', marginBottom: 10, alignItems: 'center', justifyContent: 'center'}}>
                             <View style={{maxWidth:'40%', marginRight: 5}}>
                                 <Text style={styles.text}>Owner</Text>
