@@ -13,7 +13,7 @@ export default function AddSightingPage() {
     return (
         <View style={{flex: 1}}>
             <ScrollView contentContainerStyle={styles.container}>
-                <PetProfileSelect initialSelection={selected.current} updateParentSelected={updateSelected} latLng="34.0549, 118.2426" path="add-sighting" />
+                <PetProfileSelect initialSelection={selected.current} updateParentSelected={updateSelected} latLng="34.0549, 118.2426" path="add-sighting" disableRemove={false}/>
             </ScrollView>
         </View>
     )

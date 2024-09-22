@@ -1,7 +1,8 @@
 
 import PlacesSearch from "@/components/PlacesSearch";
-import { ScrollView, View, Text, StyleSheet, Pressable } from "react-native"
+import { ScrollView, View, Text, StyleSheet, Pressable, ImageBackground, Image } from "react-native"
 import MapView from 'react-native-maps';
+import { Marker } from 'react-native-maps';
 import { useEffect, useState, useRef } from "react";
 import LoadingScreen from "@/components/LoadingScreen";
 import { getCurrLocation } from "@/utils/location"
@@ -9,16 +10,81 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import Octicons from '@expo/vector-icons/Octicons';
-import PetProfileSelect from "@/components/PetProfileSelect";
+import PetProfileSelect, { DisplayProfile } from "@/components/PetProfileSelect";
+import Constants from 'expo-constants';
+import {Callout} from 'react-native-maps';
+import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
+import { FilterModal, InfoModal } from "@/components/MapModals";
+import { SightingModal } from "@/components/SightingModal";
+import { LatLngContext } from '@/app/LatLngContext';
+
+
+function CustomMarker({sighting, filterList, openSighting}) {
+    let inFilterList = false;
+    let filteredProfileIds = Object.keys(filterList);
+
+    for (let i=0; i<filteredProfileIds.length; i++) {
+        let profileId = filteredProfileIds[i];
+        if (sighting.taggedProfiles.hasOwnProperty(profileId)) {
+            inFilterList = true;
+            }
+        }
+    let color = 'grey';
+    let userArrs = Object.values(sighting.taggedProfiles);
+    if (userArrs.length>0) { color = 'orange' }
+    for (let i=0; i<userArrs.length; i++) {
+        if (userArrs.length > 3) { color = 'limegreen' }
+    }
+    if (!(inFilterList) && filteredProfileIds.length>0) { return }
+    return (
+        <Marker coordinate={{latitude: Number(sighting.latitude), longitude: Number(sighting.longitude)}}>
+            <MaterialCommunityIcons name="map-marker" size={50} color={color} />
+            <Callout>
+                <Pressable style={{width: 200, height: 180, backgroundColor: color}} onPress={()=>{openSighting(sighting._id)}}>
+                    {sighting.photos.length>0 && <Image source={{ uri: sighting.photos[0]}} style={{width: '100%', height: 100}} />}
+                    <Text ellipsizeMode="tail" numberOfLines={2} style={{width: '100%', fontFamily: 'Poppins-Regular', fontSize: 15}}>{sighting.description}</Text>
+                    <View style={{flexDirection: "row", justifyContent: 'flex-end'}}>
+                        <Text style={{fontFamily: 'Poppins-Regular', fontSize: 18, color: 'blue'}}>Open Sighting</Text>
+                        <MaterialCommunityIcons name="cursor-default-click-outline" size={30} color="blue" />
+                    </View>
+                </Pressable>
+            </Callout>
+        </Marker>
+        )
+}
+
+async function getNearbySightings(lat: Number, lng: Number) {
+    try {
+        const targetUrl = `http://${Constants.expoConfig?.extra?.backendURL}/getNearbySightings/`;
+        const response = await fetch(targetUrl, {
+            method: "post",
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                latitude: lat,
+                longitude: lng,
+            }),
+        })
+        const arr = await response.json();
+        return arr;
+    } catch {
+        console.log("network issue.");
+        return null;
+    }
+}
 
 export default function MapPage() {
     const [latLng, setLatLng] = useState("");
     const initialLatLng = useRef("");
     const [lat, lng] = latLng.split(", ");
+    const [nearbySightings, setNearbySightings] = useState({});
     const [openInfo, setOpenInfo] = useState(false);
     const pageIsReady = useRef(false);
     const [openFilter, setOpenFilter] = useState(false);
-    const filterList = useRef([]); //will list pet profile objects that are okay to be shown on the map
+    const filterList = useRef({}); //will list pet profile objects that are okay to be shown on the map, key = pet profile id
+    const [activeSightingId, setActiveSightingId] = useState("");
 
     async function updateLatLng(geocode: String) {
         await AsyncStorage.setItem('maps_last_search_latlng', geocode);
@@ -29,6 +95,22 @@ export default function MapPage() {
         filterList.current = newObj;
     }
 
+    async function getPins() {
+        const resultsArr = await getNearbySightings(Number(lat), Number(lng));
+        if (resultsArr != null) {
+            let obj = {};
+            for (let i=0; i<resultsArr.length; i++) {
+                obj[resultsArr[i]._id] = resultsArr[i];
+                }
+            setNearbySightings(obj);
+            } 
+    }
+
+    useEffect(()=>{
+        if (latLng != "") { getPins() } 
+    }, [latLng, filterList.current])
+
+   
     useEffect(()=>{
         async function initialize() {
             let value = await AsyncStorage.getItem('maps_opened');
@@ -66,14 +148,12 @@ export default function MapPage() {
     if (initialLatLng.current == "") { return <LoadingScreen /> }
     return (
         <View style={{flex: 1}}>
-            <MapView 
-                region={{
-                    latitude: Number(lat),
-                    longitude: Number(lng),
-                    latitudeDelta: 0.0922,
-                    longitudeDelta: 0.0421,
-                  }}
+            <LatLngContext.Provider value={latLng}>
+            <MapView region={{ latitude: Number(lat), longitude: Number(lng), latitudeDelta: 0.0922, longitudeDelta: 0.0421 }}
                 style={styles.map}>
+                {Object.values(nearbySightings).map((sighting, index) => {
+                    return ( <CustomMarker key={`sighting${index}`} sighting={sighting} filterList={filterList.current} openSighting={setActiveSightingId} />)
+                })}
 
             </MapView>
             <View style={{width: "100%", position: 'absolute', top: 0, alignItems: 'flex-end', paddingTop: 30, rowGap: 20, backgroundColor: 'rgba(50,50,50,0.4)'}}>
@@ -87,26 +167,10 @@ export default function MapPage() {
             <Pressable onPress={()=>{setOpenFilter(true)}} style={{marginRight: 20, position: 'absolute', top: 100, right: 10}}>
                 <MaterialIcons name="filter-list-alt" size={45} color="black" />
             </Pressable>
-            {openFilter && <View style={{position: 'absolute', width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(149, 165, 164, 0.8)'}}> 
-                <Pressable onPress={()=>{setOpenFilter(false)}} style={{flexDirection: 'row', alignItems: 'center', alignSelf: 'flex-start', marginLeft: 30}}>
-                    <MaterialCommunityIcons name="close" size={50} color="white" />
-                    <Text style={{fontFamily: 'LilitaOne-Regular', fontSize: 20, color: 'white'}}>Close</Text>
-                </Pressable>
-                <Text style={{fontFamily: "Poppins-Regular", fontSize: 20, width: 300, marginBottom: 30}}>Select a pet profile to filter by:</Text>
-                <PetProfileSelect initialSelection={filterList.current} updateParentSelected={updateFilters} latLng={latLng} path="map" />
-            </View>}
-            {openInfo && <View style={{position: 'absolute', width: '100%', height: '100%', backgroundColor: 'rgba(50,50,50, 0.2)'}}>
-                <Pressable onPress={()=>{setOpenInfo(false)}} style={{position: 'absolute', top: 50, left: 20, flexDirection: 'row', alignItems: 'center'}}>
-                    <MaterialCommunityIcons name="close" size={50} color="white" />
-                    <Text style={{fontFamily: 'LilitaOne-Regular', fontSize: 20, color: 'white'}}>Close</Text>
-                </Pressable>
-                <View style={{width: "90%", position: 'absolute', top: 100, alignSelf: 'center', padding: 20, backgroundColor: 'rgba(149, 165, 164, 0.8)', borderRadius: 20}}>
-                    <Text style={{fontFamily: 'LilitaOne-Regular', fontSize: 35}}>Welcome to the community sightings board!</Text>
-                    <Text style={{fontFamily: 'Poppins-Regular', fontSize: 20}}>Help tag sightings users have posted with pet profiles you suspect they correspond to</Text>
-                    <Text style={{fontFamily: 'Poppins-Regular', fontSize: 20}}>{"\n"}--OR-- Help attest tags that already exist on sightings!</Text>
-                    <Text style={{fontFamily: 'Poppins-Regular', fontSize: 20}}>{"\n"}Select "filter" and visualize all tagged sightings collected for specific pet searches!</Text>
-                </View>
-            </View>}
+            {openFilter && <FilterModal setOpenFilter={setOpenFilter} filterList={filterList.current} updateFiltersRef={updateFilters} />}
+            {openInfo && <InfoModal setOpenInfo={setOpenInfo} />}
+            {nearbySightings[activeSightingId]!=null && <SightingModal sighting={nearbySightings[activeSightingId]} setActiveSightingObj={setActiveSightingId} updateSighting={getPins} />}
+        </LatLngContext.Provider>
         </View>
     )
 
