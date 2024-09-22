@@ -40,7 +40,6 @@ async function createSighting(
 	const date = new Date().toLocaleDateString();
 	const urls = await getPhotoUrls(photos);
 	const sighting = {
-		userToken: userToken,
 		petID: petToken,
 		photos: urls,
 		description: description,
@@ -52,6 +51,7 @@ async function createSighting(
 	};
 	const sightingObj = await sightings.insertOne(sighting);
 	response.token = sightingObj.insertedId;
+	await appendTaggedProfile(response.token, petToken, userToken);
 	return response;
 }
 
