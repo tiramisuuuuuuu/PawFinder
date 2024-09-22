@@ -4,7 +4,7 @@ export default function MapPageLayout() {
     return (
         <Stack screenOptions={{headerShown: false}}>
             <Stack.Screen name="index" />
-            <Stack.Screen name="view" />
+            <Stack.Screen name="view/[id]" />
         </Stack>
     )
 }

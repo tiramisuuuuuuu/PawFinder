@@ -192,7 +192,7 @@ router.post("/getNearbySightings", getNearbySightings);
 router.post("/addAvatar", upload.single("avatarImg"), addAvatar);
 
 /**
- * Add a tagged profile to a pet profile
+ * Add a tagged profile to a sighting
  * @paramtype raw json
  * @param sightingToken - sightings to add tagged profile to
  * @param petToken - pet associated with sighting

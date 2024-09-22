@@ -134,7 +134,7 @@ async function getSightings(req, res) {
 }
 
 async function getNearbySightings(req, res) {
-	result = await retrieveNearbySightings(req.body.userToken);
+	result = await retrieveNearbySightings(req.body.latitude, req.body.longitude);
 	res.send(result);
 }
 
