@@ -9,7 +9,6 @@ import { LatLngContext } from "@/app/LatLngContext";
 
 async function getPetProfileByID(id: String) {
     try {
-        console.log("trying here")
         const targetUrl = `http://${Constants.expoConfig?.extra?.backendURL}/getPetProfileByID/`;
         const response = await fetch(targetUrl, {
             method: "post",
@@ -22,7 +21,6 @@ async function getPetProfileByID(id: String) {
             }),
         })
         const responseObj = await response.json();
-        console.log(responseObj)
         return responseObj;
     } catch {
         console.log("network issue.");
@@ -71,7 +69,7 @@ export function DisplayProfile({profile, path, bgColor, children}) {
 }
 
 //initialSelection needed in order page is rerendered (by change of latlng) but prev selection should not disappear
-export default function PetProfileSelect({initialSelection, updateParentSelected, path, disableActions, disableRemove}) { //parent should have a ref variable (to prevent unnecessary rerenders), selected (obj), and updateParentSelection should be a function to update the ref
+export default function PetProfileSelect({initialSelection, updateParentSelected, path, disableRemove, disableActions}) { //parent should have a ref variable (to prevent unnecessary rerenders), selected (obj), and updateParentSelection should be a function to update the ref
     const latLng = useContext(LatLngContext);
     const [selected, setSelected] = useState(initialSelection);
     const [nearbyProfiles, setNearbyProfiles] = useState([]);

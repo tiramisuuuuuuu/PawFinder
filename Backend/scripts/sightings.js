@@ -87,7 +87,6 @@ async function retrieveNearbySightings(latitude, longitude) {
 }
 
 async function appendTaggedProfile(sightingToken, petToken, userToken) {
-	console.log("heeeeere")
 	const response = {};
 	const client = await getClient();
 	const database = client.db("petfinder");

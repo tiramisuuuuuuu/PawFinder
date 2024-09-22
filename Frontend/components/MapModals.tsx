@@ -1,18 +1,6 @@
-import PlacesSearch from "@/components/PlacesSearch";
-import { ScrollView, View, Text, StyleSheet, Pressable, ImageBackground, Image } from "react-native"
-import MapView from 'react-native-maps';
-import { Marker } from 'react-native-maps';
-import { useEffect, useState, useRef } from "react";
-import LoadingScreen from "@/components/LoadingScreen";
-import { getCurrLocation } from "@/utils/location"
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { View, Text, Pressable } from "react-native"
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
-import Octicons from '@expo/vector-icons/Octicons';
-import PetProfileSelect, { DisplayProfile } from "@/components/PetProfileSelect";
-import Constants from 'expo-constants';
-import {Callout} from 'react-native-maps';
-import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
+import PetProfileSelect from "@/components/PetProfileSelect";
 
 export function Modal({ setOpenFunct, children }) {
     return (

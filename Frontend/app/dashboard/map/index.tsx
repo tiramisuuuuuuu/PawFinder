@@ -1,6 +1,6 @@
 
 import PlacesSearch from "@/components/PlacesSearch";
-import { ScrollView, View, Text, StyleSheet, Pressable, ImageBackground, Image } from "react-native"
+import { View, Text, StyleSheet, Pressable, Image } from "react-native"
 import MapView from 'react-native-maps';
 import { Marker } from 'react-native-maps';
 import { useEffect, useState, useRef } from "react";
@@ -10,10 +10,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import Octicons from '@expo/vector-icons/Octicons';
-import PetProfileSelect, { DisplayProfile } from "@/components/PetProfileSelect";
 import Constants from 'expo-constants';
 import {Callout} from 'react-native-maps';
-import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import { FilterModal, InfoModal } from "@/components/MapModals";
 import { SightingModal } from "@/components/SightingModal";
 import { LatLngContext } from '@/app/LatLngContext';
@@ -40,7 +38,7 @@ function CustomMarker({sighting, filterList, openSighting}) {
         <Marker coordinate={{latitude: Number(sighting.latitude), longitude: Number(sighting.longitude)}}>
             <MaterialCommunityIcons name="map-marker" size={50} color={color} />
             <Callout>
-                <Pressable style={{width: 200, height: 180, backgroundColor: color}} onPress={()=>{openSighting(sighting._id)}}>
+                <Pressable style={{width: 200, height: 180, backgroundColor: color}} onPressIn={()=>{openSighting(sighting._id)}}>
                     {sighting.photos.length>0 && <Image source={{ uri: sighting.photos[0]}} style={{width: '100%', height: 100}} />}
                     <Text ellipsizeMode="tail" numberOfLines={2} style={{width: '100%', fontFamily: 'Poppins-Regular', fontSize: 15}}>{sighting.description}</Text>
                     <View style={{flexDirection: "row", justifyContent: 'flex-end'}}>
