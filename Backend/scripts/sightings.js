@@ -40,7 +40,6 @@ async function createSighting(
 	const date = new Date().toLocaleDateString();
 	const urls = await getPhotoUrls(photos);
 	const sighting = {
-		petID: petToken,
 		photos: urls,
 		description: description,
 		location: location,
