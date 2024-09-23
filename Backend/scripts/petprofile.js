@@ -4,10 +4,11 @@ const { mongoose } = require("mongoose");
 const fs = require("fs");
 
 // HELPER FUNCTIONS
-async function getPhotoUrl(photo) {
-	const imageBuffer = fs.readFileSync(photo.path);
+async function getPhotoUrl(petImage) {
+	const imageBuffer = Buffer.from(petImage, "base64");
 	const uint8Array = new Uint8Array(imageBuffer);
-	const photoRef = ref(storage, `petProfiles/${photo.filename}`);
+	const timestamp = Date.now();
+	const photoRef = ref(storage, `petprofiles/${timestamp}.png`);
 	await uploadBytes(photoRef, uint8Array);
 	const url = await getDownloadURL(photoRef);
 	return url;
@@ -44,19 +45,6 @@ async function createPetProfile(
 	];
 	if (requiredFields.includes(undefined) || requiredFields.includes(null)) {
 		response.error = "Missing one or more parameters.";
-		console.log(
-			userToken,
-			username,
-			contact,
-			petName,
-			petBreed,
-			lastSeen,
-			petDescription,
-			assignedTasks,
-			longitude,
-			latitude,
-			petImage
-		);
 		return response;
 	}
 	const database = client.db("petfinder");
