@@ -1,10 +1,10 @@
 import { Stack } from "expo-router";
 
-export default function HomeLayout() {
+export default function MapPageLayout() {
     return (
         <Stack screenOptions={{headerShown: false}}>
             <Stack.Screen name="[id]" />
-            <Stack.Screen name="add-sighting" />
+            <Stack.Screen name="view/[id]" />
         </Stack>
     )
 }

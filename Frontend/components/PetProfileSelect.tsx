@@ -76,7 +76,7 @@ export default function PetProfileSelect({initialSelection, updateParentSelected
     const input = useRef("");
     const [searching, setSearching] = useState(false);
     const [error, setError] = useState(false);
-
+    
     function removeSelection(id: String) {
         let obj = Object.assign({}, selected);
         delete obj[id];
