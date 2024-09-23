@@ -9,6 +9,7 @@ export default function ImageSelect({ setImage, disableCamera, setCurrLocation }
 
     async function pickImage() {
         let result = await ImagePicker.launchImageLibraryAsync({
+            base64: true,
             mediaTypes: ImagePicker.MediaTypeOptions.All,
             allowsEditing: true,
             aspect: [4, 3],
@@ -16,7 +17,7 @@ export default function ImageSelect({ setImage, disableCamera, setCurrLocation }
         });
     
         if (!result.canceled) {
-            setImage(result.assets[0].uri);
+            setImage(result.assets[0].base64);
             setImageUri(result.assets[0].uri);
         }
     };
@@ -40,7 +41,7 @@ export default function ImageSelect({ setImage, disableCamera, setCurrLocation }
             result = await ImagePicker.getPendingResultAsync();
         }
         if (!(result.canceled)) {
-            setImage(result.assets[0].uri);
+            setImage(result.assets[0].base64);
             setCurrLocation();
             setImageUri(result.assets[0].uri);
         }
@@ -61,7 +62,7 @@ export default function ImageSelect({ setImage, disableCamera, setCurrLocation }
             {imageUri!=null && <View style={{width: 300, height: 200, flexDirection: 'row', alignItems: 'center', backgroundColor: 'black', borderColor: 'grey', borderWidth: 2, borderRadius: 10}}>
                 <Image source={{ uri: imageUri }} resizeMode='contain' style={{width: '100%', height: '100%'}}></Image>
             </View>}
-            {imageUri!=null && <Pressable onPress={()=>{setImage(null); setImageUri(null)}} style={{alignSelf: 'flex-end'}}>
+            {imageUri!=null && <Pressable onPress={()=>{setImage(""); setImageUri(null)}} style={{alignSelf: 'flex-end'}}>
                 <Text style={{fontFamily: 'Poppins-Regular', fontSize: 17, color: 'blue', textDecorationLine: 'underline'}}>Remove Image</Text>
             </Pressable>}
         </View>
