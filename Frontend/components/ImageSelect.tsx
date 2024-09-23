@@ -54,7 +54,7 @@ export default function ImageSelect({ setImage, disableCamera, setCurrLocation }
                     <Ionicons name="camera-outline" size={80} color="black" />
                     <Text style={{fontFamily: 'Poppins-Regular', fontSize: 17, textDecorationLine: 'underline'}}>Take a photo</Text>
                 </Pressable>}
-                <Pressable onPress={()=>{pickImage()}} style={{width: disableCamera ? '100%' : '50%', height: '100%', justifyContent: 'center', alignItems: 'center', borderLeftWidth: 2, borderLeftColor: 'black'}}>
+                <Pressable onPress={()=>{pickImage()}} style={{width: disableCamera ? '100%' : '50%', height: '100%', justifyContent: 'center', alignItems: 'center', borderLeftWidth: !disableCamera && 2, borderLeftColor: !disableCamera && 'black'}}>
                     <MaterialIcons name="photo-library" size={70} color="black" style={{marginBottom: 5}}/>
                     <Text style={{fontFamily: 'Poppins-Regular', fontSize: 17, textDecorationLine: 'underline'}}>Upload a photo</Text>
                 </Pressable>

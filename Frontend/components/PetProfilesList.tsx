@@ -50,12 +50,12 @@ export default function PetProfilesList({latLng}) {
                 <View style={styles.container} key={profile._id}>
                     <Image source={{ uri: profile.photoUrl }} resizeMode="contain" style={{width: '100%', height: '42%'}} />
                     <View style={{flex:1, width: '100%', borderTopWidth: 1, borderTopColor: 'grey', backgroundColor: '#e2e1e5', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', padding: 20}}>
-                        <View style={{flexDirection: 'row', width: '100%', marginBottom: 20, alignItems: 'center', justifyContent: 'flex-start'}}>
+                        <View style={{flexDirection: 'row', width: '100%', height: 30, marginBottom: 20, alignItems: 'center', justifyContent: 'flex-start'}}>
                             <Text style={{fontFamily: 'Poppins-Regular', fontSize: 20, marginRight: 15, fontWeight: 'bold'}}>{profile.petName}</Text>
                             {(profile.petSpecies=="dog" || profile.petSpecies=="cat") && <FontAwesome5 name={profile.petSpecies} size={20} color="orange" style={{marginRight: 15}} />}
                             <Text style={{flex: 1, fontFamily: 'Poppins-Regular', fontSize: 15}}>{profile.petBreed}</Text>
                         </View>
-                        <View style={{flexDirection: 'row', width: '100%', marginBottom: 10, alignItems: 'center', justifyContent: 'flex-start', columnGap: 5}}>
+                        <View style={{flexDirection: 'row', width: '100%', height: 30, marginBottom: 10, alignItems: 'center', justifyContent: 'flex-start', columnGap: 5}}>
                             <View style={{flexDirection: 'row', width: '50%', alignItems: 'center', justifyContent: 'flex-start'}}>
                                 <Text style={{fontFamily: 'Poppins-Regular', fontSize: 12, marginRight: 5}}>
                                     <Text style={{color: 'grey'}}>Posted: </Text>

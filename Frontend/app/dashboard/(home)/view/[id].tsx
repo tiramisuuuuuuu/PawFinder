@@ -4,6 +4,7 @@ import BackButton from "@/components/BackButton";
 import Constants from 'expo-constants';
 import { useEffect, useState } from "react";
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import SimpleLineIcons from '@expo/vector-icons/SimpleLineIcons';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Link } from "expo-router";
@@ -89,11 +90,11 @@ export default function Home() {
                         </View>
                         <Text style={{marginTop: 20, width: '100%', fontFamily: 'LilitaOne-Regular', fontSize: 20, paddingLeft: 10}}>Assigned Tasks</Text>
                         <Text style={[{marginTop: 30}, styles.text]}>{`**${profile.assignedTasks}**`}</Text>
-                        <Pressable style={{marginTop: 40, paddingTop: 5, paddingBottom: 5, paddingRight: 15, paddingLeft: 15, backgroundColor: 'lightcyan', borderWidth: 2, borderColor: 'purple', borderRadius: 20}}>
+                        <Pressable style={{marginTop: 40, paddingTop: 8, paddingBottom: 5, paddingRight: 15, paddingLeft: 15, backgroundColor: 'teal', borderRadius: 10}}>
                             <Link href={`./add-sighting/${profile._id}`} onPress={()=>{console.log("add sighting pressed")}}>
                                 <View style={{justifyContent: 'center', alignItems: 'center', flexDirection: 'row'}}>
-                                    <Text style={{fontFamily: 'Poppins-Regular', fontSize: 20, color: 'purple', marginRight: 5}}>Add Sighting</Text>
-                                    <MaterialCommunityIcons name="plus-circle-outline" size={30} color="purple" />
+                                    <Text style={{fontFamily: 'Poppins-Regular', fontSize: 23, color: 'white', marginRight: 5}}>Add Sighting</Text>
+                                    <SimpleLineIcons name="magnifier-add" size={24} color="white" />
                                 </View>
                             </Link>
                         </Pressable>

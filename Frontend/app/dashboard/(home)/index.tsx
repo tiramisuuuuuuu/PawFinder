@@ -6,6 +6,7 @@ import { getCurrLocation } from "@/utils/location";
 import PlacesSearch from "@/components/PlacesSearch";
 import LoadingScreen from "@/components/LoadingScreen";
 import PetProfilesList from "@/components/PetProfilesList";
+import { Link } from "expo-router";
 
 
 export default function Home() {
@@ -37,10 +38,15 @@ export default function Home() {
     return (
         <SafeAreaView style={{flex: 1, backgroundColor: '#f1f3f9'}}>
             <ScrollView contentContainerStyle={{alignItems: 'center'}} nestedScrollEnabled={true} keyboardShouldPersistTaps="handled">
-                <View style={{width: 300, paddingTop: 50, flexDirection: 'column-reverse'}}>
+                <View style={{width: 300, paddingTop: 30, flexDirection: 'column-reverse'}}>
                     <PetProfilesList latLng={latLng} />
                     <PlacesSearch initialLatLng={initialLatLng.current} setLatLng={setLatLng} storeLatLngHistory={true} />
                     <Text style={{fontFamily: 'Poppins-Regular', fontSize: 17, marginBottom: 5, paddingLeft: 15}}>Enter Location</Text>
+                    <View style={{width: '50%', alignItems: 'flex-end', marginBottom: 20, alignSelf: 'flex-end'}}>
+                        <Link href="./create-pet-profile">
+                            <Text style={{fontFamily: 'Poppins-Regular', fontSize: 17, textAlign: 'right', textDecorationLine: 'underline', color: 'grey'}}>Click here to create A Missing Pet Profile</Text>
+                        </Link>
+                    </View>
                 </View>
             </ScrollView>
         </SafeAreaView>
