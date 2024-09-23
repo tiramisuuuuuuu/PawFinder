@@ -71,7 +71,7 @@ export default function PetProfilesList({latLng}) {
                                 <FontAwesome name="map-pin" size={15} color="grey" />
                             </View>
                         </View>
-                        <Text ellipsizeMode='tail' numberOfLines={2} style={{width: '100%', textAlign: 'left', fontFamily: 'Poppins-Regular', fontSize: 15, marginBottom: 10}}>{profile. petDescription}</Text>
+                        <Text ellipsizeMode='tail' numberOfLines={2} style={{width: '100%', height: 50, textAlign: 'left', fontFamily: 'Poppins-Regular', fontSize: 15, marginBottom: 10}}>{profile. petDescription}</Text>
                         <Pressable style={{marginTop: 5, paddingTop: 5, paddingBottom: 5, paddingRight: 10, paddingLeft: 10, backgroundColor: 'teal', borderRadius: 10}}>
                             <Link href={`./view//${profile._id}`} onPress={()=>{console.log("start search pressed")}}>
                                 <Text style={{fontFamily: 'Poppins-Regular', fontSize: 15, color: 'white'}}>Start Search</Text>
@@ -88,7 +88,7 @@ export default function PetProfilesList({latLng}) {
 const styles = StyleSheet.create({
     container: {
         width: '100%',
-        height: 350,
+        height: 370,
         alignItems: 'center',
         borderRadius: 10,
         backgroundColor: '#c7bdde',

@@ -76,7 +76,6 @@ export default function SignIn() {
 	}, [loading]);
 
 	function clickLogin_handler() {
-		setErrorObj({});
 		let emptyParams = [];
 		if (username.current == "") {
 			emptyParams.push("username");
@@ -84,6 +83,11 @@ export default function SignIn() {
 		if (password.current == "") {
 			emptyParams.push("password");
 		}
+		if (emptyParams.length!=0) {
+			setErrorObj({emptyParams: emptyParams});
+			return;
+		}
+		setErrorObj({});
 		setLoading(true);
 	}
 

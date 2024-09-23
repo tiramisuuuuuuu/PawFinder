@@ -98,8 +98,12 @@ export default function SignIn() {
 		if (password.current == "") {
 			emptyParams.push("password");
 		}
-		if (confirm_password.current == "") {
+		if (confirm_password.current != password.current) {
 			emptyParams.push("confirm_password");
+		}
+		if (emptyParams.length!=0) {
+			setErrorObj({emptyParams: emptyParams});
+			return;
 		}
 		setErrorObj({});
 		setLoading(true);
@@ -186,9 +190,7 @@ export default function SignIn() {
 					header="Password"
 					iconName="lock"
 					redBox={emptyParams.includes("confirm_password")}
-					displayErrorMsg={errorObj.hasOwnProperty(
-						"unmatchedPasswords"
-					)}
+					displayErrorMsg={emptyParams.includes("confirm_password")}
 					errorMsg="*Passwords do not match*"
 				>
 					<TextInput
