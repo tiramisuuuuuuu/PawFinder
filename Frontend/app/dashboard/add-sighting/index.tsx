@@ -11,39 +11,40 @@ import LoadingScreen from "@/components/LoadingScreen";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Constants from 'expo-constants';
 
-
-async function addSighting(imageUri, description, taggedProfileObjs, location, latitude, longitude) {
-    try {
-        let value = await AsyncStorage.getItem('token');
-        if (value == null) {
+async function sendFormData(image, description, taggedProfileIds, location, latitude, longitude) {
+    let formdata = new FormData();
+    let userToken = await AsyncStorage.getItem('token');
+        if (userToken == null) {
             return null;
         }
-        let formData = new FormData();
-        formData.append('file', {
-            uri: imageUri,
-            name: 'image.jpg',
-            type: 'image/jpeg'
-        });
-        formData.append('userToken', value);
-        formData.append('description', description);
-        formData.append('taggedProfiles', JSON.stringify(taggedProfileObjs));
-        formData.append('location', location);
-        formData.append('latitude', latitude);
-        formData.append('longitude', longitude);
 
-        await fetch(`http://${Constants.expoConfig?.extra?.backendURL}/addSighting/`, {
-            method: 'post',
-            body: formData,
-            headers: {
-                'Content-Type': 'multipart/form-data',
-            },
-        });
+    formdata.append("sightingImg", image);
+    formdata.append("userToken", userToken);
+    formdata.append('description', description);
+    formdata.append('petTokens', JSON.stringify(taggedProfileIds));
+    formdata.append('location', location);
+    formdata.append('latitude', latitude);
+    formdata.append('longitude', longitude);
 
-        return true;
-    } catch (error) {
-      console.log('Error converting to blob or uploading:', error);
-      return null;
-    }
+    let response = true;
+    await fetch(`http://${Constants.expoConfig?.extra?.backendURL}/addSighting/`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "multipart/form-data",
+        },
+        body: formdata,
+    })
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error("Network response was not ok");
+            }
+            console.log("Sighting uploaded");
+        })
+        .catch((err) => {
+            console.error("Error:", err);
+            response = false;
+        });
+    return response;
 }
 
 
@@ -58,6 +59,7 @@ export default function AddSightingPage() {
     const [loading, setLoading] = useState(false);
     const submitted = useRef(false);
     const [emptyParams, setEmptyParams] = useState([]);
+    const uploadError = useRef(false);
 
 
     function updateTaggedProfiles(obj) {
@@ -96,7 +98,10 @@ export default function AddSightingPage() {
             }
         setEmptyParams(arr);
         if (arr.length == 0) { setLoading(true) }
-        else { submitted.current = false }
+        else { 
+            uploadError.current = false;
+            submitted.current = false
+        }
     }
 
     useEffect(()=>{
@@ -108,17 +113,19 @@ export default function AddSightingPage() {
             searchBarRerenderCount.current = 0;
             taggedProfiles.current = {};
             description.current = "";
-            setLoading(false);
             submitted.current = true;
+            uploadError.current = false;
+            setLoading(false);
         }
         async function submitFormData() {
             let [lat, lng] = latLng.split(", ");
-            let taggedProfileObjs = Object.values(taggedProfiles);
-            const response = await addSighting(image, description, taggedProfileObjs, location, lat, lng);
+            let taggedProfileIds = Object.keys(taggedProfiles.current);
+            const response = await sendFormData(image, description.current, taggedProfileIds, location, lat, lng);
             if (response) {
                 updateStatesOnSuccess();
                 return;
-                } 
+                }
+            uploadError.current = true;
             setLoading(false);
         }
 
@@ -163,11 +170,12 @@ export default function AddSightingPage() {
                     <Text style={{fontFamily: 'Poppins-Regular', fontSize: 20, textAlign: 'center', color: 'purple'}}>"Successfully sumbitted sighting! Thank you for aiding the search!"</Text>
                     <MaterialCommunityIcons name="dog" size={50} color="darkorange" />
                 </View>}
-                {emptyParams.length > 0 && (
-					<Text style={styles.error}>
-						Missing one or more required parameters.
-					</Text>
-				)}
+                {emptyParams.length > 0 && ( <Text style={styles.error}>
+					Missing one or more required parameters.
+				</Text>)}
+                {uploadError.current && ( <Text style={styles.error}>
+					Network issue occurred. Please try again later.
+				</Text>)}
             </ScrollView>
         </View>
     )

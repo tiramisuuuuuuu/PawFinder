@@ -123,7 +123,7 @@ async function addSighting(req, res) {
 		req.body.description,
 		req.body.location,
 		req.body.latitude,
-		req.body.longitude
+		req.body.longitude,
 	);
 	res.send(result);
 }

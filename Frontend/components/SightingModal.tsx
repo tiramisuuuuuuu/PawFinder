@@ -59,7 +59,6 @@ export function SightingModal({ sighting, setActiveSightingId, updateSighting })
     const [activeProfileId, setActiveProfileId] = useState("");
     const updatedTagsCount = useRef(0);
     let disableActions = (activeProfileId != "");
-    console.log("INITIAL CHECK DOUG", initialPetProfileSelection)
 
 
     function setOpenFunct(bool) {
