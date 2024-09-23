@@ -84,12 +84,33 @@ async function returnSightings(userToken) {
 }
 
 async function retrieveNearbySightings(latitude, longitude) {
-	// TODO: update to get nearby sightings not all
+	const lat = Number(latitude);
+	const long = Number(longitude);
+	const milesRadius = 10000;
+	const latOffset = milesRadius / 69;
+	const longOffset = milesRadius / (69 * Math.cos(lat * (Math.PI / 180)));
+	console.log(latOffset);
+	console.log(longOffset);
+	const latMin = lat - latOffset;
+	const latMax = lat + latOffset;
+	const longMin = long - longOffset;
+	const longMax = long + longOffset;
+
 	const client = await getClient();
 	const database = client.db("petfinder");
 	const sightings = database.collection("sightings");
-
-	const sightingObjects = await sightings.find({}).toArray();
+	const sightingObjects = await sightings
+		.find({
+			$expr: {
+				$and: [
+					{ $gt: [{ $toDouble: "$latitude" }, latMin] },
+					{ $lt: [{ $toDouble: "$latitude" }, latMax] },
+					{ $gt: [{ $toDouble: "$longitude" }, longMin] },
+					{ $lt: [{ $toDouble: "$longitude" }, longMax] },
+				],
+			},
+		})
+		.toArray();
 	return sightingObjects;
 }
 
