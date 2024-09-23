@@ -4,24 +4,21 @@ const fs = require("fs");
 const { mongoose } = require("mongoose");
 
 // HELPER FUNCTIONS
-async function getPhotoUrls(photos) {
-	const urls = [];
-	for (const photo of photos) {
-		const imageBuffer = fs.readFileSync(photo.path);
-		const uint8Array = new Uint8Array(imageBuffer);
-		const photoRef = ref(storage, `sightings/${photo.filename}`);
-		await uploadBytes(photoRef, uint8Array);
-		const url = await getDownloadURL(photoRef);
-		urls.push(url);
-	}
-	return urls;
+async function getPhotoUrl(sightingImg) {
+	const imageBuffer = Buffer.from(sightingImg, "base64");
+	const uint8Array = new Uint8Array(imageBuffer);
+	const timestamp = Date.now();
+	const photoRef = ref(storage, `sightings/${timestamp}.png`);
+	await uploadBytes(photoRef, uint8Array);
+	const url = await getDownloadURL(photoRef);
+	return url;
 }
 
 // MAIN FUNCTIONS
 async function createSighting(
 	userToken,
-	petToken,
-	photos,
+	petTokens,
+	sightingImg,
 	description,
 	location,
 	latitude,
@@ -29,19 +26,27 @@ async function createSighting(
 ) {
 	const client = await getClient();
 	const response = {};
-	const requiredFields = [userToken, petToken, photos, description, location];
+	const requiredFields = [
+		userToken,
+		petTokens,
+		sightingImg,
+		description,
+		location,
+		latitude,
+		longitude,
+	];
 	if (requiredFields.includes(undefined) || requiredFields.includes(null)) {
 		response.error = "Missing one or more parameters.";
 		return response;
 	}
 
+	const petTokenArray = JSON.parse(petTokens);
 	const database = client.db("petfinder");
 	const sightings = database.collection("sightings");
 	const date = new Date().toLocaleDateString();
-	const urls = await getPhotoUrls(photos);
+	const url = await getPhotoUrl(sightingImg);
 	const sighting = {
-		petID: petToken,
-		photos: urls,
+		sightingImg: url,
 		description: description,
 		location: location,
 		latitude: latitude,
@@ -51,7 +56,9 @@ async function createSighting(
 	};
 	const sightingObj = await sightings.insertOne(sighting);
 	response.token = sightingObj.insertedId;
-	await appendTaggedProfile(response.token, petToken, userToken);
+	for (const petToken of petTokenArray) {
+		await appendTaggedProfile(response.token, petToken, userToken);
+	}
 	return response;
 }
 

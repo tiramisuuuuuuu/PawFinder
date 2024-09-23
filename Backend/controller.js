@@ -95,7 +95,7 @@ async function addPetProfile(req, res) {
 		req.body.assignedTasks,
 		req.body.latitude,
 		req.body.longitude,
-		req.file
+		req.body.petImage
 	);
 	res.send(result);
 }
@@ -118,8 +118,8 @@ async function getPetProfileByID(req, res) {
 async function addSighting(req, res) {
 	result = await createSighting(
 		req.body.userToken,
-		req.body.petToken,
-		req.files,
+		req.body.petTokens,
+		req.body.sightingImg,
 		req.body.description,
 		req.body.location,
 		req.body.latitude,
