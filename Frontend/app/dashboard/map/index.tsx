@@ -31,7 +31,7 @@ function CustomMarker({sighting, filterList, openSighting}) {
     let userArrs = Object.values(sighting.taggedProfiles);
     if (userArrs.length>0) { color = 'orange' }
     for (let i=0; i<userArrs.length; i++) {
-        if (userArrs.length > 3) { color = 'limegreen' }
+        if (userArrs[i].length > 4) { color = 'limegreen' }
     }
     if (!(inFilterList) && filteredProfileIds.length>0) { return }
     return (
@@ -39,7 +39,7 @@ function CustomMarker({sighting, filterList, openSighting}) {
             <MaterialCommunityIcons name="map-marker" size={50} color={color} />
             <Callout>
                 <Pressable style={{width: 200, height: 180, backgroundColor: color}} onPressIn={()=>{openSighting(sighting._id)}}>
-                    {sighting.photos.length>0 && <Image source={{ uri: sighting.photos[0]}} style={{width: '100%', height: 100}} />}
+                    {(sighting.sightingImg!=null) && <Image source={{ uri: sighting.sightingImg}} style={{width: '100%', height: 100}} />}
                     <Text ellipsizeMode="tail" numberOfLines={2} style={{width: '100%', fontFamily: 'Poppins-Regular', fontSize: 15}}>{sighting.description}</Text>
                     <View style={{flexDirection: "row", justifyContent: 'flex-end'}}>
                         <Text style={{fontFamily: 'Poppins-Regular', fontSize: 18, color: 'blue'}}>Open Sighting</Text>
@@ -167,7 +167,7 @@ export default function MapPage() {
             </Pressable>
             {openFilter && <FilterModal setOpenFilter={setOpenFilter} filterList={filterList.current} updateFiltersRef={updateFilters} />}
             {openInfo && <InfoModal setOpenInfo={setOpenInfo} />}
-            {nearbySightings[activeSightingId]!=null && <SightingModal sighting={nearbySightings[activeSightingId]} setActiveSightingObj={setActiveSightingId} updateSighting={getPins} />}
+            {nearbySightings[activeSightingId]!=null && <SightingModal sighting={nearbySightings[activeSightingId]} setActiveSightingId={setActiveSightingId} updateSighting={getPins} />}
         </LatLngContext.Provider>
         </View>
     )

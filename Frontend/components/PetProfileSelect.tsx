@@ -69,7 +69,7 @@ export function DisplayProfile({profile, path, bgColor, children}) {
 }
 
 //initialSelection needed in order page is rerendered (by change of latlng) but prev selection should not disappear
-export default function PetProfileSelect({initialSelection, updateParentSelected, path, disableRemove, disableActions}) { //parent should have a ref variable (to prevent unnecessary rerenders), selected (obj), and updateParentSelection should be a function to update the ref
+export default function PetProfileSelect({initialSelection, updateParentSelected, path, disableRemove, disableActions, ...props}) { //parent should have a ref variable (to prevent unnecessary rerenders), selected (obj), and updateParentSelection should be a function to update the ref
     const latLng = useContext(LatLngContext);
     const [selected, setSelected] = useState(initialSelection);
     const [nearbyProfiles, setNearbyProfiles] = useState([]);
@@ -87,7 +87,12 @@ export default function PetProfileSelect({initialSelection, updateParentSelected
     function addSelection(id, newObj) {
         let obj = Object.assign({}, selected);
         obj[id] = newObj;
-        updateParentSelected(obj);
+        if (props.updateParentById) {
+            updateParentSelected(id);
+        }
+        else {
+            updateParentSelected(obj);
+        }
         setSelected(obj);
     }
 

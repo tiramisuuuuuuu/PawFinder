@@ -51,24 +51,25 @@ async function addTaggedProfile(sightingToken, petToken, userToken) {
     }
 }
 
-export function SightingModal({ sighting, setActiveSightingObj, updateSighting }) {
+export function SightingModal({ sighting, setActiveSightingId, updateSighting }) {
     const compIsReady = useRef(false);
     const userToken = useRef("")
     const [taggedProfiles, setTaggedProfiles] = useState([]);
+    const [initialPetProfileSelection, setInitialPetProfileSelection] = useState({}); //object version of tagged profiles (key=profile._id)
     const [activeProfileId, setActiveProfileId] = useState("");
     const updatedTagsCount = useRef(0);
     let disableActions = (activeProfileId != "");
-    const [initialPetProfileSelection, setInitialPetProfileSelection] = useState({});
+    console.log("INITIAL CHECK DOUG", initialPetProfileSelection)
+
 
     function setOpenFunct(bool) {
         if (bool == false) {
-            setActiveSightingObj(null);
+            setActiveSightingId("");
         }
     }
 
-    function tagNewProfile(obj) {
-        let profileId = (Object.keys(obj))[0];
-        if (profileId) {
+    function tagNewProfile(profileId: String) {
+        if (profileId != "") {
             setActiveProfileId(profileId);
         }
     }
@@ -128,7 +129,7 @@ export function SightingModal({ sighting, setActiveSightingObj, updateSighting }
                 {!compIsReady && <LoadingScreen />}
                 {compIsReady && <ScrollView contentContainerStyle={{alignItems: 'center'}}>
                 <Text style={{width: '100%', textAlign: 'left', fontFamily: 'Poppins-Regular', fontSize: 20, marginBottom: 10, textDecorationLine: 'underline'}}>Sighting</Text>
-                    <Image source={{ uri: sighting.photos[0] }} resizeMode="contain" style={{width: '100%', height: 200}} />
+                    <Image source={{ uri: sighting.sightingImg }} resizeMode="contain" style={{width: '100%', height: 200}} />
                     <View style={{flexDirection: 'row', width: '100%', marginTop: 10, marginBottom: 10, alignItems: 'center', justifyContent: 'flex-start'}}>
                         <Text style={{fontFamily: 'Poppins-Regular', fontSize: 12, marginRight: 5}}>
                             <Text style={{color: 'grey'}}>Posted: </Text>
@@ -147,10 +148,10 @@ export function SightingModal({ sighting, setActiveSightingObj, updateSighting }
                     <View style={{marginBottom: 20, rowGap: 10}}>
                         {taggedProfiles.map((profile)=>{ 
                             let userArr = sighting.taggedProfiles[profile._id];
-                            let countText = "< 4 votes"
+                            let countText = "=< 4 votes"
                             let bgColor = "darkorange"
                             let iconColor="black"
-                            if (userArr.length > 3) {
+                            if (userArr.length > 4) {
                                 countText="> 4 votes",
                                 bgColor="limegreen"
                                 }
@@ -169,7 +170,7 @@ export function SightingModal({ sighting, setActiveSightingObj, updateSighting }
                             )})}
                         </View>
                         <Text style={{fontFamily: "Poppins-Regular", fontSize: 15, width: 300, marginBottom: 30}}>Add a new tag:</Text>
-                        <PetProfileSelect initialSelection={initialPetProfileSelection} updateParentSelected={tagNewProfile} path="map" disableRemove={true} disableActions={disableActions} />
+                        <PetProfileSelect initialSelection={initialPetProfileSelection} updateParentSelected={tagNewProfile} path="map" disableRemove={true} disableActions={disableActions} updateParentById={true} />
                         <Text style={{width: '100%', textAlign: 'right', fontFamily: 'Poppins-Regular', fontSize: 15}}>PawFinder</Text>
                     </ScrollView>}
                 </View>
