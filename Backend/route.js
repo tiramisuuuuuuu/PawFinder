@@ -125,7 +125,7 @@ router.post("/getUserBadges", getUserBadges);
  * @param latitude - latitude of owner
  * @returns pet profile token
  */
-router.post("/addPetProfile", upload.single("petImage"), addPetProfile);
+router.post("/addPetProfile", upload.none(), addPetProfile);
 
 /**
  * Gets all the pet profiles attached to the user
@@ -157,14 +157,14 @@ router.post("/getPetProfileByID", getPetProfileByID);
  * @paramtype form data
  * @param userToken - token of user that is adding the sighting
  * @param petTokens - the id of the pet the sighting is for
- * @param photos - photos of the sighting
+ * @param sightingImg - picture of the sighting
  * @param description - description of the sighting
  * @param location - location of where sighting occured
  * @param latitude - latitude of location
  * @param longitude - longitude of location
  * @returns - Success or error message
  */
-router.post("/addSighting", upload.array("photos", 10), addSighting);
+router.post("/addSighting", upload.none(), addSighting);
 
 /**
  * Gets sightings of a user
