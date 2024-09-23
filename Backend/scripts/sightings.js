@@ -20,7 +20,7 @@ async function getPhotoUrls(photos) {
 // MAIN FUNCTIONS
 async function createSighting(
 	userToken,
-	petToken,
+	petTokens,
 	photos,
 	description,
 	location,
@@ -29,12 +29,21 @@ async function createSighting(
 ) {
 	const client = await getClient();
 	const response = {};
-	const requiredFields = [userToken, petToken, photos, description, location];
+	const requiredFields = [
+		userToken,
+		petTokens,
+		photos,
+		description,
+		location,
+		latitude,
+		longitude,
+	];
 	if (requiredFields.includes(undefined) || requiredFields.includes(null)) {
 		response.error = "Missing one or more parameters.";
 		return response;
 	}
 
+	const petTokenArray = JSON.parse(petTokens);
 	const database = client.db("petfinder");
 	const sightings = database.collection("sightings");
 	const date = new Date().toLocaleDateString();
@@ -50,7 +59,9 @@ async function createSighting(
 	};
 	const sightingObj = await sightings.insertOne(sighting);
 	response.token = sightingObj.insertedId;
-	await appendTaggedProfile(response.token, petToken, userToken);
+	for (const petToken of petTokenArray) {
+		await appendTaggedProfile(response.token, petToken, userToken);
+	}
 	return response;
 }
 

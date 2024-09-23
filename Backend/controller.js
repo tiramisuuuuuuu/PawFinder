@@ -118,7 +118,7 @@ async function getPetProfileByID(req, res) {
 async function addSighting(req, res) {
 	result = await createSighting(
 		req.body.userToken,
-		req.body.petToken,
+		req.body.petTokens,
 		req.files,
 		req.body.description,
 		req.body.location,

@@ -156,7 +156,7 @@ router.post("/getPetProfileByID", getPetProfileByID);
  * Adds a sighting of a pet
  * @paramtype form data
  * @param userToken - token of user that is adding the sighting
- * @param petToken - the id of the pet the sighting is for
+ * @param petTokens - the id of the pet the sighting is for
  * @param photos - photos of the sighting
  * @param description - description of the sighting
  * @param location - location of where sighting occured
