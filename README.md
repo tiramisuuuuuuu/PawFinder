@@ -35,6 +35,7 @@ Frontend is built using Expo
 Backend is built using ExpressJS and Firebase and MongoDB for persistent storage
 
 **Our Experience**
+
 Building Pawfinder was a super insightful experience; we had never made an app or Restful api previously but the idea of Pawfinder was a perfect motivation! We learned a lot about the nuances of app building (such as stack design, user authentication, and generating tokens), how to integrate services like Google Maps Api, Firebase, and MongoDB to bring our functionality to life, and much more!
 
 **Images**
@@ -53,8 +54,8 @@ Building Pawfinder was a super insightful experience; we had never made an app o
 ![IMG_6015](https://github.com/user-attachments/assets/68a6039d-2984-4a31-9100-d6aa5288239f)
 ![IMG_6017](https://github.com/user-attachments/assets/40cc7307-19fa-4ebe-8c8e-9b4866030291)
 ![IMG_6018](https://github.com/user-attachments/assets/be617135-498a-4791-8e53-0457500fc592)
-![IMG_6024](https://github.com/user-attachments/assets/bbf17cf8-4a47-4c01-a74f-6844652359c9)
 ![IMG_6022](https://github.com/user-attachments/assets/a6feb360-8cce-4474-b264-cb87e86dd3ff)
+![IMG_6024](https://github.com/user-attachments/assets/bbf17cf8-4a47-4c01-a74f-6844652359c9)
 
 
 
