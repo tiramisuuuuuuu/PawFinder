@@ -4,14 +4,25 @@ import { getCurrLocation, getLocation } from "@/utils/location"
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import Constants from 'expo-constants';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import Entypo from '@expo/vector-icons/Entypo';
+
+
+/*  PlacesSearch creates a search bar powered by GooglePlacesAutocomplete
+    @params:
+        @initialLatLng: {lat, lng} coordinates that will be used to initialize the search in the search bar, the closest place name will be displayed in stead of the coordinates
+        @setLatLng: function to set an object {lat, lng} in the parent for each place search
+        @storeLatLngHistory: bool that tells whether to store the {lat, lng} of the latest place searches into AsyncStorage as the "last searched location"
+        @props.includeLocation: bool that indicates that the setLatLng function expects you to return the name of the place searches, as well as the lat, lng
+*/
 
 export default function PlacesSearch({initialLatLng, setLatLng, storeLatLngHistory, ...props}) {
-    const ref = useRef();
+    const ref = useRef(); // store reference to GooglePlaceAutocomplete component to operate on it in functions
     const [editable, setEditable] = useState(false);
     const iconPressCount = useRef(0);
     
-    async function selectLoc_handler(details) {
+
+    // handle clicking one of the autocompleted search options; param: a Place Object
+    async function selectLoc_handler(details) { 
         if (details) {
             const geocode = `${details.geometry?.location.lat}, ${details.geometry?.location.lng}`;
             if (storeLatLngHistory) { await AsyncStorage.setItem('last_search_latlng', geocode) }
@@ -24,11 +35,13 @@ export default function PlacesSearch({initialLatLng, setLatLng, storeLatLngHisto
             }
         }
     }
+
+    // handle clicking on the "Select Current Location"/pin icon
     async function pressIcon_handler() {
         iconPressCount.current=iconPressCount.current+1;
-        setEditable(false);
+        setEditable(false); // restrict searches in the search box as to prevent overwrites of potential place 
+                            // searches when the "Select Current Location" function resolves     
     }
-
     useEffect(()=>{
         async function setCurrLocation() {
             console.log("getting current location");
@@ -37,8 +50,10 @@ export default function PlacesSearch({initialLatLng, setLatLng, storeLatLngHisto
                 if (storeLatLngHistory) { await AsyncStorage.setItem('last_search_latlng', geocode) }
                 setLatLng(geocode);
                 let [lat, long] = geocode.split(", ");
+
+                // must manually set text of google search bar
                 const value = await getLocation(Number(lat), Number(long));
-                await ref.current?.setAddressText(value); //must manually set text of google search bar
+                await ref.current?.setAddressText(value);
             }
             setEditable(true);
         }
@@ -46,6 +61,9 @@ export default function PlacesSearch({initialLatLng, setLatLng, storeLatLngHisto
         if (iconPressCount.current != 0) { setCurrLocation() }
     }, [iconPressCount.current])
 
+
+    // On initial render or when initialLatLng param changes, set the initial place search in the box based 
+    // on the initialLatLng param
     useEffect(()=>{
         async function initialize() {
             if (initialLatLng == "") { 
@@ -53,6 +71,8 @@ export default function PlacesSearch({initialLatLng, setLatLng, storeLatLngHisto
                 return;
             }
             let [lat, long] = initialLatLng.split(", ");
+
+            // must manually set text of google search bar
             const value = await getLocation(Number(lat), Number(long));
             await ref.current?.setAddressText(value);
             setEditable(true);
@@ -61,9 +81,10 @@ export default function PlacesSearch({initialLatLng, setLatLng, storeLatLngHisto
         initialize();
     }, [initialLatLng])
 
+    
     return (
-        <View style={{width: 300, height: 50, backgroundColor: 'transparent', justifyContent: 'center', alignItems: 'flex-end'}}>
-            <View style={{width: '87%', maxHeight: 300, position: 'absolute', top: 0, left: 0}}>
+        <View style={styles.mainContainer}>
+            <View style={styles.contentContainer}>
                 <GooglePlacesAutocomplete
                     ref={ref}
                     placeholder='Search a location'
@@ -76,14 +97,37 @@ export default function PlacesSearch({initialLatLng, setLatLng, storeLatLngHisto
                     textInputProps={{
                         editable: editable,  // Disable the search bar
                     }}
-                    styles={editable ? styles : inputUneditable_styles} />
+                    styles={editable ? input_styles : inputUneditable_styles} />
             </View>
-            <Pressable onPressIn={()=>{ pressIcon_handler() }} style={{width: '10%', marginBottom: 10, marginRight: 5}} disabled={!editable}><MaterialIcons name="my-location" size={30} color="teal" /></Pressable>
+            <Pressable onPressIn={()=>{ pressIcon_handler() }} style={styles.pinIcon} disabled={!editable}><Entypo name="location-pin" size={30} color="teal" /></Pressable>
         </View>
     )
 }
 
+
+
 const styles = StyleSheet.create({
+    mainContainer: {
+        width: 300, 
+        height: 50, 
+        justifyContent: 'center', 
+        alignItems: 'flex-end'
+    },
+    contentContainer: {
+        width: '85%',
+        maxHeight: 300, // max dropdown height
+        position: 'absolute',
+        top: 0,
+        left: 0
+    },
+    pinIcon: {
+        width: '10%',
+        marginBottom: 8,
+        marginRight: 10
+    }
+});
+
+const input_styles = StyleSheet.create({
     textInputContainer: {
         backgroundColor: 'grey',
         borderRadius: 5

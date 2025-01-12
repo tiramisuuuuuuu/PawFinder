@@ -12,40 +12,11 @@ import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { styles } from "./styles";
 import InputField from "../../components/InputField";
 import { Link, router } from "expo-router";
-import Constants from 'expo-constants';
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { bypassAuthentication, createNewUser } from '@/utils/signinFunctions';
 
-// Delete after development
-function bypassAuthentication() {
-	router.replace("/dashboard");
-}
 
-const createNewUser = async (
-	usr: string,
-	email: string,
-	pwd: string,
-	confirm_pwd: string
-) => {
-	try {
-		const response = await fetch(`http://${Constants.expoConfig?.extra?.backendURL}/addUser/`, {
-			// Change localhost to your IP
-			method: "post",
-			headers: {
-				Accept: "application/json",
-				"Content-Type": "application/json",
-			},
-			body: JSON.stringify({
-				username: usr,
-				email: email,
-				password: pwd,
-				confirmPassword: confirm_pwd,
-			}),
-		});
-		return response.json();
-	} catch (err) {
-		return { error: "Network issue." };
-	}
-};
+
 
 export default function SignIn() {
 	const [loading, setLoading] = useState(false);

@@ -1,5 +1,5 @@
 import { useLocalSearchParams } from "expo-router";
-import AddSightingPage from "@/components/AddSightingPage";
+import AddSightingPage from "@/components/AddSightingForm";
 import { View } from "react-native";
 import LoadingScreen from "@/components/LoadingScreen";
 import { useEffect, useState, useRef } from "react";

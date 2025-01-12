@@ -49,7 +49,7 @@ async function sendFormData(image, description, taggedProfileIds, location, lati
 }
 
 
-export default function AddSightingPage({initialSelection, path, ...props}) {
+export default function AddSightingForm({initialSelection, path, ...props}) {
     const [image, setImage] = useState("");
     const [latLng, setLatLng] = useState("");
     const [initialLatLng, setInitialLatLng] = useState("");
@@ -185,7 +185,6 @@ export default function AddSightingPage({initialSelection, path, ...props}) {
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: '#e0e0e0',
         alignItems: 'center',
         flexDirection: 'column-reverse',
         rowGap: 50,

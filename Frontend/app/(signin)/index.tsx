@@ -4,41 +4,14 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { styles } from "./styles";
 import InputField from "../../components/InputField";
 import { Link, router } from 'expo-router';
-import Constants from 'expo-constants';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { bypassAuthentication, login } from '@/utils/signinFunctions';
+import LoadingScreen from "@/components/LoadingScreen";
 
 interface LoginResult {
 	token?: string;
 	error?: string;
 }
-
-// Delete after development
-function bypassAuthentication() {
-	router.replace("/dashboard");
-}
-
-const login = async (usr: string, pwd: string) => {
-	try {
-		const response = await fetch(
-			`http://${Constants.expoConfig?.extra?.backendURL}/authenticateUser/`,
-			{
-				// Change localhost to your IP
-				method: "post",
-				headers: {
-					Accept: "application/json",
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({
-					username: usr,
-					password: pwd,
-				}),
-			}
-		);
-		return response.json();
-	} catch (err) {
-		return { error: "Network issue." };
-	}
-};
 
 export default function SignIn() {
 	const [loading, setLoading] = useState(false);
@@ -50,20 +23,21 @@ export default function SignIn() {
 		emptyParams = errorObj.emptyParams;
 	}
 
+
+
 	useEffect(() => {
-		async function sign_in() {
-			//-----------------add sign up function here, plus error handling (setErrorObj) is response is {error: "text"}
+		async function sign_in() { // call sign up function then do error handling ( setErrorObj({error: "display text"}) )
 			const result: LoginResult = await login(
 				username.current,
 				password.current
 			);
-			if (result.error) {
+			if (result.error) { // error has occurred
 				username.current = "";
 				password.current = "";
 				setErrorObj(result);
 				setLoading(false);
 				return;
-			} else if (result.token) {
+			} else if (result.token) { // successful login, save user's session token
 				await AsyncStorage.setItem("token", result.token);
 			}
 			router.replace("/dashboard");
@@ -74,6 +48,8 @@ export default function SignIn() {
 			sign_in();
 		}
 	}, [loading]);
+
+
 
 	function clickLogin_handler() {
 		let emptyParams = [];
@@ -91,19 +67,9 @@ export default function SignIn() {
 		setLoading(true);
 	}
 
-	if (loading) {
-		return (
-			<View
-				style={{
-					flex: 1,
-					justifyContent: "center",
-					alignItems: "center",
-				}}
-			>
-				<ActivityIndicator />
-			</View>
-		);
-	}
+
+
+	if (loading) { return <LoadingScreen /> }
 	return (
 		<View style={{ flex: 1, backgroundColor: "white" }}>
 			<ScrollView contentContainerStyle={styles.container}>
@@ -112,9 +78,7 @@ export default function SignIn() {
 						Missing one or more parameters.
 					</Text>
 				)}
-				{errorObj.hasOwnProperty("error") && (
-					<Text style={styles.error}>{errorObj.error}</Text>
-				)}
+				{errorObj.hasOwnProperty("error") && ( <Text style={styles.error}>{errorObj.error}</Text> )}
 				<Text
 					style={{
 						fontFamily: "LilitaOne-Regular",
@@ -139,8 +103,7 @@ export default function SignIn() {
 						onChangeText={(newText) => {
 							username.current = newText;
 						}}
-						style={styles.input}
-					/>
+						style={styles.input} />
 				</InputField>
 
 				<InputField
@@ -155,8 +118,7 @@ export default function SignIn() {
 						onChangeText={(newText) => {
 							password.current = newText;
 						}}
-						style={styles.input}
-					/>
+						style={styles.input} />
 				</InputField>
 
 				<Text
@@ -225,13 +187,11 @@ export default function SignIn() {
 							justifyContent: "center",
 							alignItems: "center",
 						}}
-						onPress={bypassAuthentication}
-					>
+						onPress={bypassAuthentication} >
 						<Image
 							source={require("./google_icon.png")}
 							resizeMode="contain"
-							style={styles.alt_icon}
-						/>
+							style={styles.alt_icon} />
 					</TouchableOpacity>
 				</View>
 			</ScrollView>

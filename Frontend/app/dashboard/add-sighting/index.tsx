@@ -1,4 +1,4 @@
-import AddSightingPage from "@/components/AddSightingPage";
+import AddSightingPage from "@/components/AddSightingForm";
 import { View } from "react-native";
 
 export default function AddSighting() {

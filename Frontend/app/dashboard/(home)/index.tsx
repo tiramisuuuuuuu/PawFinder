@@ -1,5 +1,5 @@
 
-import { ScrollView, View, StyleSheet, Pressable, Text, TextInput, SafeAreaView } from "react-native"
+import { ScrollView, View, Text, SafeAreaView, StyleSheet } from "react-native"
 import { useEffect, useState, useRef } from "react";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getCurrLocation } from "@/utils/location";
@@ -8,6 +8,11 @@ import LoadingScreen from "@/components/LoadingScreen";
 import PetProfilesList from "@/components/PetProfilesList";
 import { Link } from "expo-router";
 
+/* 
+    Home creates a page that displays pet profiles with last seen locations that match the 
+    specified search location. It also contains links to the Create Missing Pet Profile page
+    and Message Box page.
+*/
 
 export default function Home() {
     const [latLng, setLatLng] = useState("");
@@ -36,15 +41,15 @@ export default function Home() {
 
     if (initialLatLng.current == "") { return <LoadingScreen /> }
     return (
-        <SafeAreaView style={{flex: 1, backgroundColor: '#f1f3f9'}}>
+        <SafeAreaView style={styles.mainContainer}>
             <ScrollView contentContainerStyle={{alignItems: 'center'}} nestedScrollEnabled={true} keyboardShouldPersistTaps="handled">
-                <View style={{width: 300, paddingTop: 30, flexDirection: 'column-reverse'}}>
+                <View style={styles.contentContainer}>
                     <PetProfilesList latLng={latLng} />
                     <PlacesSearch initialLatLng={initialLatLng.current} setLatLng={setLatLng} storeLatLngHistory={true} />
                     <Text style={{fontFamily: 'Poppins-Regular', fontSize: 17, marginBottom: 5, paddingLeft: 15}}>Enter Location</Text>
                     <View style={{width: '50%', alignItems: 'flex-end', marginBottom: 20, alignSelf: 'flex-end'}}>
                         <Link href="./create-pet-profile">
-                            <Text style={{fontFamily: 'Poppins-Regular', fontSize: 17, textAlign: 'right', textDecorationLine: 'underline', color: 'grey'}}>Click here to create A Missing Pet Profile</Text>
+                            <Text style={{fontFamily: 'Poppins-Regular', fontSize: 15, textAlign: 'right', textDecorationLine: 'underline', color: 'grey'}}>Click here to create A Missing Pet Profile</Text>
                         </Link>
                     </View>
                 </View>
@@ -52,3 +57,14 @@ export default function Home() {
         </SafeAreaView>
     )
 }
+
+const styles = StyleSheet.create({
+    mainContainer: {
+        flex: 1,
+    },
+    contentContainer: {
+        width: 300,
+        paddingTop: 30,
+        flexDirection: 'column-reverse'
+    }
+});

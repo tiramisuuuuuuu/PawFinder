@@ -1,76 +1,31 @@
-import { Pressable, TextInput, View, Text, Image, ScrollView } from "react-native"
+import { Pressable, TextInput, View, Text, StyleSheet } from "react-native"
 import { useEffect, useState, useRef, useContext } from "react";
-import Constants from 'expo-constants';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
-import { Link } from "expo-router";
-import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import { LatLngContext } from "@/app/LatLngContext";
+import PetProfileWidget from "./PetProfileWidget";
+import { getNearbyPetProfiles, getPetProfileByID } from "@/utils/petProfileFunction";
 
-async function getPetProfileByID(id: String) {
-    try {
-        const targetUrl = `http://${Constants.expoConfig?.extra?.backendURL}/getPetProfileByID/`;
-        const response = await fetch(targetUrl, {
-            method: "post",
-            headers: {
-                Accept: "application/json",
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                petToken: id,
-            }),
-        })
-        const responseObj = await response.json();
-        return responseObj;
-    } catch {
-        console.log("network issue.");
-        return null;
-    }
-}
 
-async function getNearbyPetProfiles(lat: Number, lng: Number) {
-    try {
-        const targetUrl = `http://${Constants.expoConfig?.extra?.backendURL}/getNearbyPetProfiles/`;
-        const response = await fetch(targetUrl, {
-            method: "post",
-            headers: {
-                Accept: "application/json",
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                latitude: lat,
-                longitude: lng,
-            }),
-        })
-        const arr = await response.json();
-        return arr;
-    } catch {
-        console.log("network issue.");
-        return null;
-    }
-}
 
-export function DisplayProfile({profile, path, bgColor, children}) {
-    return (
-        <View style={{width: 300, height: 80, flexDirection: 'row', alignItems: 'center', backgroundColor: bgColor, borderRadius: 20, overflow: "hidden"}}>
-            <Image source={{ uri: profile.photoUrl }} resizeMode="contain" style={{height: '100%', width: '30%', backgroundColor: 'grey'}} />
-            <Text ellipsizeMode="tail" numberOfLines={2} style={{width: '40%', padding: 5, fontFamily: 'Poppins-Regular', fontSize: 15}}>
-                <Text>{profile.petName}</Text>
-                <Text style={{fontSize: 10}}>{"\n"+profile.petBreed}</Text>
-            </Text>
-            <View style={{width: '20%', flexDirection: 'row'}}>
-                <Link href={`./${path}/view/${profile._id}`} onPress={()=>{console.log("view profile pressed")}}>
-                    <MaterialCommunityIcons name="dog" size={30} color="orange" />
-                </Link>
-                {children}
-            </View>
-        </View>
-    )
-}
 
-//initialSelection needed in order page is rerendered (by change of latlng) but prev selection should not disappear
+/*  PetProfileSelect allows users to select pet Profiles from a list of nearby pet Profiles to the searched lat lng or 
+    to select a pet profile by searched the id of the pet profile in a search bar. This function updates the 
+    Selected-Pet-Profiles var of the parent
+    @param
+        @initialSelection: holds pet Profiles that the user previously selected and that is remembered by the parent,
+            necessary in order to maintain list in case of rerenders of this component from lat Lng changes. An object
+            containing keys of petProfile ids and values that are the profile data Objects
+        @updateParentSelected: function to be able to update the selectedProfiles var of the parent
+        @path: the base path to open up the pet profile pages
+        @disableRemove: bool that toggles the functionality of petProfileSlect
+            true means the profileSelect is meant for upvoting and replaces the remove action with the upvote symbol
+            false means the profileSelect is meant for selecting tags and allows removing selections 
+        @disableActions: bool that disable actions, upvoting or remove, until previous actions resolve
+*/
+
 export default function PetProfileSelect({initialSelection, updateParentSelected, path, disableRemove, disableActions, ...props}) { //parent should have a ref variable (to prevent unnecessary rerenders), selected (obj), and updateParentSelection should be a function to update the ref
-    const latLng = useContext(LatLngContext);
+    const latLng = useContext(LatLngContext); // get the {lat, lng} context of the parent (uses the place searches done from within the parent)
     const [selected, setSelected] = useState(initialSelection);
     const [nearbyProfiles, setNearbyProfiles] = useState([]);
     const input = useRef("");
@@ -78,14 +33,14 @@ export default function PetProfileSelect({initialSelection, updateParentSelected
     const [error, setError] = useState(false);
     
     function removeSelection(id: String) {
-        let obj = Object.assign({}, selected);
+        let obj = Object.assign({}, selected); // makes a copy of selected
         delete obj[id];
         updateParentSelected(obj);
         setSelected(obj);
     }
 
-    function addSelection(id, newObj) {
-        let obj = Object.assign({}, selected);
+    function addSelection(id: String, newObj: Object) {
+        let obj = Object.assign({}, selected); // makes a copy of selected
         obj[id] = newObj;
         if (props.updateParentById) {
             updateParentSelected(id);
@@ -96,6 +51,8 @@ export default function PetProfileSelect({initialSelection, updateParentSelected
         setSelected(obj);
     }
 
+
+    // if searching state is true, get Searched Pet Profile and update the necessary state variables
     useEffect(()=>{
         function updateComp(resultObj) {
             if (resultObj != null) {
@@ -116,10 +73,14 @@ export default function PetProfileSelect({initialSelection, updateParentSelected
         if (input.current != "" && searching) {search()};
     }, [searching])
 
+
+    // ensure the component rerenders when the initialSelection param (a ref.current in the parent) changes
     useEffect(()=>{
         setSelected(initialSelection);
     }, [initialSelection])
 
+
+    // initialize the nearbyPetProfiles list that users can select from
     useEffect(()=>{
         async function initialize() {
             if (latLng == "") { return }
@@ -132,42 +93,122 @@ export default function PetProfileSelect({initialSelection, updateParentSelected
 
         initialize();
     }, [latLng])
+
+
     return (
-        <View style={{width: 300, alignSelf: 'center', marginBottom: 15}}>
-            <View style={{borderBottomWidth: 1, height: 45, borderRadius: 8, borderColor: 'grey', backgroundColor: 'grey'}}>
-                <TextInput placeholder="Search by pet profile id" onChangeText={(newText)=>{input.current=newText}} onSubmitEditing={()=>{setSearching(true)}} editable={!searching} style={{width: 300, height: 40, marginBottom: 10, padding: 5, paddingLeft: 10, paddingRight: 10, fontFamily: 'Poppins-Regular', fontSize: 16, borderRadius: 7, borderColor: error ? 'red' : 'grey', backgroundColor: searching ? 'lavender' : 'white'}} />
+        <View style={styles.mainContainer}>
+            <View style={styles.stylizedBorderBox}>
+                <TextInput
+                    placeholder="Search by pet profile id"
+                    onChangeText={(newText)=>{input.current=newText}}
+                    onSubmitEditing={()=>{setSearching(true)}}
+                    editable={!searching}
+                    style={[styles.inputBox, error ? styles.inputErrorBorder : styles.inputBoxBorder, searching ? styles.inputBoxDisabled : styles.inputBoxEnabled]} />
             </View>
-            {error && <Text style={{fontFamily: 'Poppins-Regular', fontSize: 15, color: 'red', padding: 20, paddingTop: 0}}>** No search results found at this time.</Text>}
-            <View style={{width: '100%', maxHeight: 300}}><ScrollView>
-            <View style={{width: '100%', rowGap: 5}}>
+
+            {error && <Text style={styles.searchErrorText}>No search results found at this time.</Text>}
+
+            {!disableRemove && <View style={styles.selectedProfilesContainer}>
                 {Object.values(selected).map((profile)=>{ 
-                    if (disableRemove && selected.hasOwnProperty(profile._id)) { return }
                     return (
-                        <DisplayProfile profile={profile} path={path} bgColor="grey">
-                            {!disableRemove && <Pressable disabled={disableActions} onPress={()=>{removeSelection(profile._id)}} style={{marginLeft: 15}}>
-                                <MaterialCommunityIcons name="window-close" size={30} style={{color: disableActions ? 'lavender' : "black"}} />
+                        <PetProfileWidget profile={profile} path={path} bgColor="grey">
+                            {!disableRemove && <Pressable disabled={disableActions} onPress={()=>{removeSelection(profile._id)}} style={styles.profileActionIconContainer}>
+                                <MaterialCommunityIcons name="window-close" style={disableActions ? styles.disabledActionIcon : styles.enabledActionIcon} />
                             </Pressable>}
-                            {disableRemove && <Pressable disabled={true} style={{marginLeft: 15}}>
-                                <FontAwesome5 name="long-arrow-alt-up" size={35} color="gainsboro" />
-                            </Pressable>}
-                        </DisplayProfile>
+                        </PetProfileWidget>
                     )} )}
-            </View>
-            <View style={{width: '100%', rowGap: 5}}>
-                <Text style={{width: '100%', paddingLeft: 30, fontFamily: 'Poppins-Regular', fontSize: 15, color: 'grey', marginTop: 10}}>
+            </View>}
+
+            <View style={styles.unselectedProfileContainer}>
+                <Text style={styles.selectProfileInstruction}>
                     <Text>Select From Nearby Pet Profiles</Text>
-                    {nearbyProfiles.length==0 && <Text>...</Text>}</Text>
+                    {nearbyProfiles.length==0 && <Text>...</Text>}
+                </Text>
+
                 {nearbyProfiles.map((profile)=>{ 
                     if (selected.hasOwnProperty(profile._id)) { return }
                     return (
-                        <DisplayProfile profile={profile} path={path} bgColor="white">
-                            <Pressable disabled={disableActions} onPress={()=>{addSelection(profile._id, profile)}} style={{marginLeft: 15}}>
-                                <FontAwesome6 name="add" size={30} style={{color: disableActions ? 'lavender' : "black"}} />
+                        <PetProfileWidget profile={profile} path={path} bgColor="white">
+                            <Pressable disabled={disableActions} onPress={()=>{addSelection(profile._id, profile)}} style={styles.profileActionIconContainer}>
+                                <FontAwesome6 name="add" style={disableActions ? styles.disabledActionIcon : styles.enabledActionIcon} />
                             </Pressable>
-                        </DisplayProfile>    
+                        </PetProfileWidget>    
                 )} )}
             </View>
-            </ScrollView></View>
         </View>
     )
 }
+
+const styles = StyleSheet.create({
+    mainContainer: {
+        width: 300,
+        alignSelf: 'center',
+        marginBottom: 15
+    },
+    stylizedBorderBox: {
+        borderBottomWidth: 1, 
+        height: 45, 
+        borderRadius: 8, 
+        borderColor: 'grey', 
+        backgroundColor: 'grey'
+    },
+    inputBox: {
+        width: 300, 
+        height: 40, 
+        marginBottom: 10, 
+        padding: 5, 
+        paddingLeft: 10, 
+        paddingRight: 10, 
+        fontFamily: 'Poppins-Regular', 
+        fontSize: 16, 
+        borderRadius: 7,
+    },
+    inputBoxBorder: {
+        borderColor: 'grey'
+    },
+    inputErrorBorder: {
+        borderColor: 'red'
+    },
+    inputBoxEnabled: {
+        backgroundColor: 'white'
+    },
+    inputBoxDisabled: {
+        backgroundColor: 'lavendar'
+    },
+    searchErrorText: {
+        fontFamily: 'Poppins-Regular',
+        fontSize: 15,
+        color: 'red',
+        padding: 20,
+        paddingTop: 0
+    },
+    selectedProfilesContainer: {
+        width: '100%', 
+        rowGap: 5,
+        marginTop: 10
+    },
+    unselectedProfileContainer: {
+        width: '100%',
+        rowGap: 5,
+        marginTop: 10
+    },
+    profileActionIconContainer: {
+        marginLeft: 15
+    },
+    disabledActionIcon: {
+        fontSize: 30,
+        color: 'lavender'
+    },
+    enabledActionIcon: {
+        fontSize: 30,
+        color: 'black'
+    },
+    selectProfileInstruction: {
+        width: '100%', 
+        paddingLeft: 30, 
+        fontFamily: 'Poppins-Regular', 
+        fontSize: 15, 
+        color: 'grey'
+    }
+    
+});

@@ -13,7 +13,7 @@ import Octicons from '@expo/vector-icons/Octicons';
 import Constants from 'expo-constants';
 import {Callout} from 'react-native-maps';
 import { FilterModal, InfoModal } from "@/components/MapModals";
-import { SightingModal } from "@/components/SightingModal";
+import SightingModal from "@/components/SightingModal";
 import { LatLngContext } from '@/app/LatLngContext';
 
 
@@ -37,15 +37,16 @@ function CustomMarker({sighting, filterList, openSighting}) {
     return (
         <Marker coordinate={{latitude: Number(sighting.latitude), longitude: Number(sighting.longitude)}}>
             <MaterialCommunityIcons name="map-marker" size={50} color={color} />
-            <Callout>
-                <Pressable style={{width: 200, height: 180, backgroundColor: color}} onPressIn={()=>{openSighting(sighting._id)}}>
+
+            <Callout onPress={()=>{openSighting(sighting._id)}}>
+                <View style={{width: 200, height: 180, backgroundColor: color}} >
                     {(sighting.sightingImg!=null) && <Image source={{ uri: sighting.sightingImg}} style={{width: '100%', height: 100}} />}
                     <Text ellipsizeMode="tail" numberOfLines={2} style={{width: '100%', fontFamily: 'Poppins-Regular', fontSize: 15}}>{sighting.description}</Text>
                     <View style={{flexDirection: "row", justifyContent: 'flex-end'}}>
                         <Text style={{fontFamily: 'Poppins-Regular', fontSize: 18, color: 'blue'}}>Open Sighting</Text>
                         <MaterialCommunityIcons name="cursor-default-click-outline" size={30} color="blue" />
                     </View>
-                </Pressable>
+                </View>
             </Callout>
         </Marker>
         )

@@ -1,57 +1,27 @@
 import { Modal } from "./MapModals";
-import { ScrollView, View, Text, Pressable, Image } from "react-native"
+import { ScrollView, View, Text, Pressable, Image, StyleSheet } from "react-native"
 import { useEffect, useState, useRef } from "react";
 import LoadingScreen from "@/components/LoadingScreen";
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import PetProfileSelect, { DisplayProfile } from "@/components/PetProfileSelect";
-import Constants from 'expo-constants';
+import PetProfileSelect from "@/components/PetProfileSelect";
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import PetProfileWidget from "./PetProfileWidget";
+import { getPetProfileByID } from "@/utils/petProfileFunction";
+import { addTaggedProfile } from "@/utils/sightingFunctions";
 
 
-async function getPetProfileByID(id: String) {
-    try {
-        const targetUrl = `http://${Constants.expoConfig?.extra?.backendURL}/getPetProfileByID/`;
-        const response = await fetch(targetUrl, {
-            method: "post",
-            headers: {
-                Accept: "application/json",
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                petToken: id,
-            }),
-        })
-        const responseObj = await response.json();
-        return responseObj;
-    } catch {
-        console.log("network issue.");
-        return null;
-    }
-}
+/*  When you click on a Sighting pin on the map, SightingModal renders a Modal screen that displays the 
+    contents of Sighting data object. This includes a list petProfilesWidgets that were tagged to the 
+    specific sighting by other users and that can be upvoted and it includes a section for the user to
+    tag other petProfiles that they think may match with the sighting.
+    @params
+        @sighting: of type sighting Object
+        @setActiveSightingId: function that takes a bool to indicate whether the modal is opened or closed
+        @updateSighting: function from parent to update the sighting Object
+*/
 
-async function addTaggedProfile(sightingToken, petToken, userToken) {
-    try {
-        const targetUrl = `http://${Constants.expoConfig?.extra?.backendURL}/addTaggedProfile/`;
-        await fetch(targetUrl, {
-            method: "post",
-            headers: {
-                Accept: "application/json",
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                sightingToken: sightingToken,
-		        petToken: petToken,
-		        userToken: userToken
-            }),
-        })
-        return
-    } catch {
-        console.log("network issue.");
-    }
-}
-
-export function SightingModal({ sighting, setActiveSightingId, updateSighting }) {
+export default function SightingModal({ sighting, setActiveSightingId, updateSighting }) {
     const compIsReady = useRef(false);
     const userToken = useRef("")
     const [taggedProfiles, setTaggedProfiles] = useState([]);
@@ -60,7 +30,7 @@ export function SightingModal({ sighting, setActiveSightingId, updateSighting })
     const updatedTagsCount = useRef(0);
     let disableActions = (activeProfileId != "");
 
-
+    // close the modal by updating the state of the parent
     function setOpenFunct(bool) {
         if (bool == false) {
             setActiveSightingId("");
@@ -93,6 +63,8 @@ export function SightingModal({ sighting, setActiveSightingId, updateSighting })
         updateTaggedProfiles(arr, obj);
     }
 
+
+    // signal parent to look up updated sighting Obj, essentially to get SightingModal to rerender in order to update tags List
     useEffect(()=>{
         async function getUpdatedTags() {
             await updateSighting();
@@ -101,6 +73,8 @@ export function SightingModal({ sighting, setActiveSightingId, updateSighting })
         if (updatedTagsCount.current != 0) { getUpdatedTags() } 
     }, [updatedTagsCount.current])
 
+
+    // resolves actions such as upvoting profiles or adding new profile tags indicated by activeProfileIdactiveProfileId
     useEffect(()=>{
         async function addTag() {
             await addTaggedProfile(sighting._id, activeProfileId, userToken.current);
@@ -111,6 +85,7 @@ export function SightingModal({ sighting, setActiveSightingId, updateSighting })
         if (activeProfileId != "") { addTag() } 
     }, [activeProfileId])
 
+    
     useEffect(()=>{
         async function initialize() {
             let value = await AsyncStorage.getItem('token');
@@ -121,30 +96,40 @@ export function SightingModal({ sighting, setActiveSightingId, updateSighting })
         }
 
         initialize();
-    }, []);
+    }, [sighting]);
+
     return (
         <Modal setOpenFunct={setOpenFunct}>
-            <View style={{width: 350, height: 500, padding: 20, backgroundColor: 'gainsboro', borderRadius: 20}}>
+            <View style={styles.modalBox}>
                 {!compIsReady && <LoadingScreen />}
                 {compIsReady && <ScrollView contentContainerStyle={{alignItems: 'center'}}>
-                <Text style={{width: '100%', textAlign: 'left', fontFamily: 'Poppins-Regular', fontSize: 20, marginBottom: 10, textDecorationLine: 'underline'}}>Sighting</Text>
-                    <Image source={{ uri: sighting.sightingImg }} resizeMode="contain" style={{width: '100%', height: 200}} />
-                    <View style={{flexDirection: 'row', width: '100%', marginTop: 10, marginBottom: 10, alignItems: 'center', justifyContent: 'flex-start'}}>
-                        <Text style={{fontFamily: 'Poppins-Regular', fontSize: 12, marginRight: 5}}>
-                            <Text style={{color: 'grey'}}>Posted: </Text>
-                            <Text>{sighting.date}</Text>
-                        </Text>
-                        <FontAwesome name="clock-o" size={15} color="grey" style={{marginRight: 15}} />
-                        <Text style={{fontFamily: 'Poppins-Regular', fontSize: 12, marginRight: 5}}>
-                            <Text style={{color: 'grey'}}>Location: </Text>
-                            <Text>{sighting.location}</Text>
-                        </Text>
-                        <FontAwesome name="map-pin" size={15} color="grey" />
+                    <Text style={styles.header}>Sighting</Text>
+
+                    <Image source={{ uri: sighting.sightingImg }} resizeMode="contain" style={styles.sightingImg} />
+
+                    <View style={styles.detailsContainer}>
+                        <View style={styles.detailDiv}>
+                            <Text style={styles.detailText} ellipsizeMode='tail' numberOfLines={3}>
+                                <Text style={{color: 'grey'}}>Posted: </Text>
+                                <Text>{sighting.date}</Text>
+                            </Text>
+                            <FontAwesome name="clock-o" style={styles.detailIcon} />
+                        </View>
+                        
+                        <View style={styles.detailDiv}>
+                            <Text style={styles.detailText}>
+                                <Text style={{color: 'grey'}}>Last Seen: </Text>
+                                <Text>{sighting.location}</Text>
+                            </Text>
+                            <FontAwesome name="map-pin" style={styles.detailIcon} />
+                        </View>
                     </View>
-                    <Text style={{width: '100%', textAlign: 'left', fontFamily: 'Poppins-Regular', fontSize: 15, marginBottom: 30}}>{sighting.description}</Text>
+
+                    <Text style={styles.sightingDescription}>{sighting.description}</Text>
+                
+                    <Text style={styles.tagsHeader}>Tagged Pet Profiles</Text>
                     
-                    <Text style={{fontFamily: "Poppins-Regular", fontSize: 15, width: 300, marginBottom: 30}}>Tagged Pet Profiles</Text>
-                    <View style={{marginBottom: 20, rowGap: 10}}>
+                    <View style={styles.taggedProfilesContainer}>
                         {taggedProfiles.map((profile)=>{ 
                             let userArr = sighting.taggedProfiles[profile._id];
                             let countText = "=< 4 votes"
@@ -158,21 +143,102 @@ export function SightingModal({ sighting, setActiveSightingId, updateSighting })
                             else if (userArr.includes(userToken.current)) { iconColor="green" }
 
                             return (
-                                <View style={{justifyContent: 'center', alignItems: 'center', marginLeft: 15}}>
-                                    <DisplayProfile profile={profile} path="map" bgColor={bgColor}>
+                                <View style={{justifyContent: 'center', alignItems: 'center'}}>
+                                    <PetProfileWidget profile={profile} path="map" bgColor={bgColor}>
                                         <Pressable disabled={disableActions || userArr.includes(userToken.current)} onPress={()=>{setActiveProfileId(profile._id)}} style={{marginLeft: 15}}>
                                             <FontAwesome5 name="long-arrow-alt-up" size={35} color={iconColor} />
                                         </Pressable>
-                                    </DisplayProfile>
-                                    <Text style={{width: '100%', fontFamily: 'Poppins-Regular', fontSize: 15, textAlign: 'right', color: bgColor}}>{countText}</Text>
+                                    </PetProfileWidget>
+
+                                    <Text style={[styles.taggedProfileUpvoteCount, {color: bgColor}]}>{countText}</Text>
                                 </View>
                             )})}
-                        </View>
-                        <Text style={{fontFamily: "Poppins-Regular", fontSize: 15, width: 300, marginBottom: 30}}>Add a new tag:</Text>
-                        <PetProfileSelect initialSelection={initialPetProfileSelection} updateParentSelected={tagNewProfile} path="map" disableRemove={true} disableActions={disableActions} updateParentById={true} />
-                        <Text style={{width: '100%', textAlign: 'right', fontFamily: 'Poppins-Regular', fontSize: 15}}>PawFinder</Text>
-                    </ScrollView>}
-                </View>
+                    </View>
+
+                    <Text style={styles.tagsHeader}>Add a new tag:</Text>
+
+                    <PetProfileSelect initialSelection={initialPetProfileSelection} updateParentSelected={tagNewProfile} path="map" disableRemove={true} disableActions={disableActions} updateParentById={true} />
+                    
+                    <Text style={styles.footer}>PawFinder</Text>
+                </ScrollView>}
+            </View>
         </Modal>
     )
 }
+
+const styles = StyleSheet.create({
+    modalBox: {
+        width: 350,
+        height: 500,
+        padding: 20,
+        backgroundColor: 'gainsboro',
+        borderRadius: 20
+    },
+    header: {
+        width: '100%', 
+        textAlign: 'left', 
+        fontFamily: 'Poppins-Regular', 
+        fontSize: 20, 
+        marginBottom: 10, 
+        textDecorationLine: 'underline'
+    },
+    sightingImg: {
+        width: '100%', 
+        height: 200
+    },
+    detailsContainer: {
+        flexDirection: 'row', 
+        width: '100%', 
+        height: 50, 
+        marginTop: 20, 
+        marginBottom: 20, 
+        alignItems: 'center', 
+        justifyContent: 'space-between', 
+        columnGap: 10,
+    },
+    detailDiv: {
+        flexDirection: 'column', 
+        width: '50%', 
+        alignItems: 'flex-start', 
+        justifyContent: 'center',
+    },
+    detailText: {
+        width: '100%',
+        fontFamily: 'Poppins-Regular', 
+        fontSize: 13,
+        wordWrap: 'break-word',
+    },
+    detailIcon: {
+        fontSize: 15,
+        color: 'grey'
+    },
+    sightingDescription: {
+        width: '100%', 
+        textAlign: 'left', 
+        fontFamily: 'Poppins-Regular', 
+        fontSize: 15, 
+        marginBottom: 30
+    },
+    tagsHeader: {
+        fontFamily: "Poppins-Regular", 
+        fontSize: 15, 
+        width: 300, 
+        marginBottom: 30
+    },
+    taggedProfilesContainer: {
+        marginBottom: 20,
+        rowGap: 10
+    },
+    taggedProfileUpvoteCount: {
+        width: '100%', 
+        fontFamily: 'Poppins-Regular', 
+        fontSize: 15, 
+        textAlign: 'right', 
+    },
+    footer: {
+        width: '100%', 
+        textAlign: 'right', 
+        fontFamily: 'Poppins-Regular', 
+        fontSize: 15
+    }
+});
